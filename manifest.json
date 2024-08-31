@@ -9,6 +9,14 @@
   },
   "content_scripts": [
     {
+      "js": ["scripts/socket-sniffer.js"],
+      "matches": [
+        "https://www1.flightrising.com/play/glimmer-and-gloom"
+      ],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
       "js": ["scripts/content.js"],
       "matches": [
         "https://www1.flightrising.com/play/glimmer-and-gloom"
