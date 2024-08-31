@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Launch hello.html",
+      "runtimeArgs": ["--load-extension=${workspaceFolder}", "--disk-cache-dir=${workspaceFolder}/tmp/chrome-cache"],
+      "userDataDir": "${workspaceRoot}/tmp/chrome-user-data",
+    }
+  ]
+}
