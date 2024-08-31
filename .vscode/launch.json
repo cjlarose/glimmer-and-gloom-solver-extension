@@ -7,6 +7,7 @@
       "name": "Launch hello.html",
       "runtimeArgs": ["--load-extension=${workspaceFolder}", "--disk-cache-dir=${workspaceFolder}/tmp/chrome-cache"],
       "userDataDir": "${workspaceRoot}/tmp/chrome-user-data",
+      "url": "https://www1.flightrising.com/play/glimmer-and-gloom"
     }
   ]
 }
