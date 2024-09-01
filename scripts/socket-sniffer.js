@@ -19,6 +19,7 @@
 
     wsAddListener(ws, 'message', function(event) {
       console.log("Received:", event);
+      window.postMessage({ type: 'WS_MESSAGE_RECEIVED', data: event.data });
     });
     return ws;
   }.bind();
