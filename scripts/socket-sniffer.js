@@ -30,6 +30,7 @@
   wsSend = wsSend.apply.bind(wsSend);
   OrigWebSocket.prototype.send = function(data) {
     console.log("Sent:", data);
+    window.postMessage({ type: 'WS_MESSAGE_SENT', data: data });
     return wsSend(this, arguments);
   };
 })();
