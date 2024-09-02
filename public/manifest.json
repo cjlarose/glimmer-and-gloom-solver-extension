@@ -17,7 +17,7 @@
       "run_at": "document_start"
     },
     {
-      "js": ["scripts/content.js"],
+      "js": ["isolated-content.js"],
       "matches": [
         "https://www1.flightrising.com/play/glimmer-and-gloom"
       ]
