@@ -1,6 +1,7 @@
 import { Level, Tile, TileState } from './level';
 import { generateAugmentedMatrix, solveMod2Matrix, getSolutionCoordinates } from './solve';
 import { SocketIOPacketType } from './socket_io';
+import { Coord } from './coords';
 
 const GG_EVENT_GENERATE_LEVEL = "generateLevel";
 
@@ -16,6 +17,7 @@ interface WaitingForLevelData {
 interface ReceivedLevelData {
   type: "RECEIVED_LEVEL_DATA";
   level: Level;
+  minimalSolution: Coord[];
 }
 
 export type ConnectionState = ConnectionInit | WaitingForLevelData | ReceivedLevelData;
@@ -104,6 +106,7 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
         return {
           type: "RECEIVED_LEVEL_DATA",
           level,
+          minimalSolution,
         };
       }
       return state;
