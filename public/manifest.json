@@ -20,7 +20,8 @@
       "js": ["isolated-content.js"],
       "matches": [
         "https://www1.flightrising.com/play/glimmer-and-gloom"
-      ]
+      ],
+      "world": "ISOLATED"
     }
   ],
   "background": {
