@@ -235,13 +235,8 @@ function generateAugmentedMatrix(level: Level, desiredState: TileState): number[
 let connectionState: ConnectionState = initialState;
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log("Service worker received message");
-  console.log({ message, sender });
   connectionState = handlePacket(connectionState, message.data);
-  console.log({ connectionState });
   sendResponse({ reply: "Thanks" });
 
   return true;
 });
-
-console.log('service-worker registered event listener');
