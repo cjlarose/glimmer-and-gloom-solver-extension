@@ -123,6 +123,13 @@ function handlePacket(state: ConnectionState = initialState, packet: String): Co
         });
 
         console.log({ solutionCoords });
+
+        const minimalSolution = solutionCoords.reduce((minSolution, currentSolution) => {
+            return currentSolution.length < minSolution.length ? currentSolution : minSolution;
+        }, solutionCoords[0]);
+
+        console.log({ minimalSolution });
+
         return {
           type: "RECEIVED_LEVEL_DATA",
           level,
