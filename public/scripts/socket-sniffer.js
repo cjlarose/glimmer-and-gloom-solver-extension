@@ -18,7 +18,6 @@
     }
 
     wsAddListener(ws, 'message', function(event) {
-      console.log("Received:", event);
       window.postMessage({ type: 'WS_MESSAGE_RECEIVED', data: event.data });
     });
     return ws;
@@ -29,7 +28,6 @@
   var wsSend = OrigWebSocket.prototype.send;
   wsSend = wsSend.apply.bind(wsSend);
   OrigWebSocket.prototype.send = function(data) {
-    console.log("Sent:", data);
     window.postMessage({ type: 'WS_MESSAGE_SENT', data: data });
     return wsSend(this, arguments);
   };
