@@ -112,6 +112,7 @@ function handlePacket(state: ConnectionState = initialState, packet: String): Co
           ackId === state.ackId &&
           Array.isArray(payload)) {
         const level = parseLevel(payload[0]);
+        console.log({ level });
         const augmentedMatrix = generateAugmentedMatrix(level, TileState.DARK);
         console.log({ augmentedMatrix });
         const solutions = solveMod2Matrix(augmentedMatrix);
