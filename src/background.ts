@@ -9,14 +9,14 @@ enum TileState {
 }
 
 interface Tile {
-  row: Number;
-  column: Number;
+  row: number;
+  column: number;
   status: TileState;
 }
 
 interface Level {
-  rows: Number;
-  columns: Number;
+  rows: number;
+  columns: number;
   tiles: Tile[];
 }
 
@@ -26,7 +26,7 @@ interface ConnectionInit {
 
 interface WaitingForLevelData {
   type: "WAITING_FOR_LEVEL_DATA";
-  ackId: Number;
+  ackId: number;
 }
 
 interface ReceivedLevelData {
@@ -39,14 +39,14 @@ type ConnectionState = ConnectionInit | WaitingForLevelData | ReceivedLevelData;
 const initialState: ConnectionState = { type: "INIT" };
 
 interface TileData {
-  row: Number;
-  column: Number;
+  row: number;
+  column: number;
   status: 0 | 1;
 }
 
 interface LevelData {
-  rows: Number;
-  columns: Number;
+  rows: number;
+  columns: number;
   tiles: TileData[];
 }
 
@@ -112,6 +112,8 @@ function handlePacket(state: ConnectionState = initialState, packet: String): Co
           ackId === state.ackId &&
           Array.isArray(payload)) {
         const level = parseLevel(payload[0]);
+        const augmentedMatrix = generateAugmentedMatrix(level, TileState.DARK);
+        console.log({ augmentedMatrix });
         return {
           type: "RECEIVED_LEVEL_DATA",
           level,
@@ -133,6 +135,102 @@ function handlePacket(state: ConnectionState = initialState, packet: String): Co
       return state;
   }
 };
+
+// https://www.redblobgames.com/grids/hexagons/#coordinates-offset
+const DIRECTION_DIFFERENCES = [
+    // even rows
+    [[+1,  0], [+1, -1], [ 0, -1],
+     [-1,  0], [ 0, +1], [+1, +1]],
+    // odd rows
+    [[+1,  0], [ 0, -1], [-1, -1],
+     [-1,  0], [-1, +1], [ 0, +1]],
+];
+
+enum DIRECTION {
+  EAST,
+  NORTHEAST,
+  NORTHWEST,
+  WEST,
+  SOUTHWEST,
+  SOUTHEAST,
+}
+
+interface Coord {
+  row: number;
+  column: number;
+}
+
+function getOffsetNeighbor(coord: Coord, direction: DIRECTION) {
+  const parity = coord.row & 1;
+  const [columnDiff, rowDiff] = DIRECTION_DIFFERENCES[parity][direction];
+  return {
+    row: coord.row + rowDiff,
+    column: coord.column + columnDiff,
+  };
+}
+
+interface GridDimensions {
+  rows: number;
+  columns: number;
+}
+
+function getAllNeighbors(coord: Coord, level: GridDimensions): Coord[] {
+  const neighbors: Coord[] = [];
+
+  for (let direction in DIRECTION) {
+    if (isNaN(Number(direction))) continue; // Skip non-numeric values (TypeScript enum issue)
+
+    const neighbor = getOffsetNeighbor(coord, Number(direction));
+
+    // Check if the neighbor is within the bounds of the level grid (1-indexed)
+    if (
+      neighbor.row >= 1 && neighbor.row <= level.rows &&
+      neighbor.column >= 1 && neighbor.column <= level.columns
+    ) {
+      neighbors.push(neighbor);
+    }
+  }
+
+  return neighbors;
+}
+
+function generateAugmentedMatrix(level: Level, desiredState: TileState): number[][] {
+  // Create a mapping of coordinates to indices in the matrix
+  const coordToIndex: Map<string, number> = new Map();
+  let index = 0;
+  for (const tile of level.tiles) {
+    coordToIndex.set(`${tile.row},${tile.column}`, index++);
+  }
+
+  const matrix: number[][] = [];
+
+  for (const tile of level.tiles) {
+    const row: number[] = new Array(level.tiles.length).fill(0);
+    const neighbors = getAllNeighbors({ row: tile.row, column: tile.column }, level);
+
+    // Set the coefficient for the current tile
+    const tileIndex = coordToIndex.get(`${tile.row},${tile.column}`)
+    if (tileIndex !== undefined) {
+      row[tileIndex] = 1;
+    }
+
+    // Add coefficients for neighbors
+    for (const neighbor of neighbors) {
+      const neighborIndex = coordToIndex.get(`${neighbor.row},${neighbor.column}`);
+      if (neighborIndex !== undefined) {
+        row[neighborIndex] = 1;
+      }
+    }
+
+    // Determine the right-hand side of the congruence
+    const targetModulus = (desiredState === tile.status) ? 0 : 1;
+
+    // Append the row to the matrix with the augmented value
+    matrix.push([...row, targetModulus]);
+  }
+
+  return matrix;
+}
 
 let connectionState: ConnectionState = initialState;
 
