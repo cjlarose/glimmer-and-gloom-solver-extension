@@ -113,11 +113,15 @@ function handlePacket(state: ConnectionState = initialState, packet: String): Co
           Array.isArray(payload)) {
         const level = parseLevel(payload[0]);
         console.log({ level });
-        const augmentedMatrix = generateAugmentedMatrix(level, TileState.DARK);
-        console.log({ augmentedMatrix });
-        const solutions = solveMod2Matrix(augmentedMatrix);
-        console.log({ solutions });
-        const solutionCoords = getSolutionCoordinates(level, solutions);
+
+        const solutionCoords = [TileState.DARK, TileState.LIGHT].flatMap(desiredState => {
+            const augmentedMatrix = generateAugmentedMatrix(level, desiredState);
+            console.log({ augmentedMatrix });
+            const solutions = solveMod2Matrix(augmentedMatrix);
+            console.log({ solutions });
+            return getSolutionCoordinates(level, solutions);
+        });
+
         console.log({ solutionCoords });
         return {
           type: "RECEIVED_LEVEL_DATA",
