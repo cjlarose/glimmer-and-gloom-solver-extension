@@ -1,35 +1,46 @@
+import { SocketIOPacketType } from './lib/socket_io';
+
+const ENGINE_IO_PACKET_TYPE_MESSAGE = 4;
+
 window.addEventListener("message", function(event) {
-    // Only accept messages from the same window
-    if (event.source !== window) return;
+  // Only accept messages from the same window
+  if (event.source !== window) return;
 
-    console.log('content script');
-    console.log({ event });
-
-    // Check if the message is intended for the extension
-    if (event.data === undefined) {
+  // Check if the message is intended for the extension
+  if (event.data === undefined) {
       return;
-    }
+  }
 
-    switch (event.data.type) {
-      case "WS_MESSAGE_RECEIVED":
-        // Relay the message to the service worker
-        console.log('sending (received) message to service worker');
-        console.log({ data: event.data.data });
-        chrome.runtime.sendMessage(event.data, function(response) {
-            // Send the response back to the main world
-            console.log("(received) Content script got response from service worker");
-            console.log({ response });
-        });
-        console.log("Enqueued message to send to service worker");
-        break;
-      case "WS_MESSAGE_SENT":
-        console.log('sending (sent) message to service worker');
-        console.log({ data: event.data.data });
-        chrome.runtime.sendMessage(event.data, function(response) {
-            // Send the response back to the main world
-            console.log("(sent) Content script got response from service worker");
-            console.log({ response });
-        });
-        break;
-    }
+  const engineIOPacket = event.data.data;
+  const engineIOPacketType = parseInt(engineIOPacket.charAt(0), 10);
+  if (engineIOPacketType != ENGINE_IO_PACKET_TYPE_MESSAGE) {
+      return;
+  }
+
+  const socketIOPacketType = parseInt(engineIOPacket.charAt(1), 10);
+
+  if (socketIOPacketType != SocketIOPacketType.EVENT && socketIOPacketType != SocketIOPacketType.ACK) {
+      return;
+  }
+
+  // Extract the acknowledgement ID (all digits after the socketIOPacketType)
+  const ackIdDigits: string[] = [];
+  let index = 2; // Start after the socketIOPacketType
+  while (index < engineIOPacket.length && /\d/.test(engineIOPacket.charAt(index))) {
+      ackIdDigits.push(engineIOPacket.charAt(index));
+      index++;
+  }
+
+  // Parse the ackId as a number
+  const ackId = ackIdDigits.length > 0 ? parseInt(ackIdDigits.join(''), 10) : null;
+
+  // Extract the JSON-encoded payload (everything after the ackId)
+  const payload = JSON.parse(engineIOPacket.slice(index));
+
+  const message = { socketIOPacketType, ackId, payload };
+  chrome.runtime.sendMessage(message, function(response) {
+      // Send the response back to the main world
+      console.log("(received) Content script got response from service worker");
+      console.log({ response });
+  });
 });

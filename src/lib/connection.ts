@@ -1,9 +1,7 @@
 import { Level, Tile, TileState } from './level';
 import { generateAugmentedMatrix, solveMod2Matrix, getSolutionCoordinates } from './solve';
+import { SocketIOPacketType } from './socket_io';
 
-const ENGINE_IO_PACKET_TYPE_MESSAGE = 4;
-const SOCKET_IO_PACkET_TYPE_EVENT = 2;
-const SOCKET_IO_PACkET_TYPE_ACK = 3;
 const GG_EVENT_GENERATE_LEVEL = "generateLevel";
 
 interface ConnectionInit {
@@ -50,29 +48,16 @@ function parseLevel(levelData: LevelData): Level {
   };
 }
 
-export function handlePacket(state: ConnectionState = initialState, packet: String): ConnectionState {
-  const engineIOPacket = packet;
-  const engineIOPacketType = parseInt(engineIOPacket.charAt(0), 10);
-  if (engineIOPacketType != ENGINE_IO_PACKET_TYPE_MESSAGE) {
-    return state;
-  }
+export interface Message {
+    socketIOPacketType: SocketIOPacketType;
+    ackId: number;
+    payload: any;
+}
 
-  const socketIOPacketType = parseInt(engineIOPacket.charAt(1), 10);
+export function handlePacket(state: ConnectionState = initialState, message: Message): ConnectionState {
+  console.log({ state, message });
 
-  // Extract the acknowledgement ID (all digits after the socketIOPacketType)
-  const ackIdDigits: string[] = [];
-  let index = 2; // Start after the socketIOPacketType
-  while (index < engineIOPacket.length && /\d/.test(engineIOPacket.charAt(index))) {
-    ackIdDigits.push(engineIOPacket.charAt(index));
-    index++;
-  }
-
-  // Parse the ackId as a number
-  const ackId = ackIdDigits.length > 0 ? parseInt(ackIdDigits.join(''), 10) : null;
-
-  // Extract the JSON-encoded payload (everything after the ackId)
-  const payload = JSON.parse(engineIOPacket.slice(index));
-
+  const { socketIOPacketType, ackId, payload } = message;
 
   // state init
   //   if sending event (generate level) => state waiting for level data
@@ -83,7 +68,7 @@ export function handlePacket(state: ConnectionState = initialState, packet: Stri
 
   switch (state.type) {
     case "INIT":
-      if (socketIOPacketType == SOCKET_IO_PACkET_TYPE_EVENT &&
+      if (socketIOPacketType == SocketIOPacketType.EVENT &&
           Array.isArray(payload) &&
           payload[0] === GG_EVENT_GENERATE_LEVEL &&
           ackId !== null) {
@@ -94,7 +79,7 @@ export function handlePacket(state: ConnectionState = initialState, packet: Stri
       }
       return state;
     case "WAITING_FOR_LEVEL_DATA":
-      if (socketIOPacketType == SOCKET_IO_PACkET_TYPE_ACK &&
+      if (socketIOPacketType == SocketIOPacketType.ACK &&
           ackId === state.ackId &&
           Array.isArray(payload)) {
         const level = parseLevel(payload[0]);
@@ -123,7 +108,7 @@ export function handlePacket(state: ConnectionState = initialState, packet: Stri
       }
       return state;
     case "RECEIVED_LEVEL_DATA":
-      if (socketIOPacketType == SOCKET_IO_PACkET_TYPE_EVENT &&
+      if (socketIOPacketType == SocketIOPacketType.EVENT &&
           Array.isArray(payload) &&
           payload[0] === GG_EVENT_GENERATE_LEVEL &&
           ackId !== null) {
