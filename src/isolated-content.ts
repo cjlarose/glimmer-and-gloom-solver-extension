@@ -46,6 +46,12 @@ function applySolutionOverlay(difficulty: LevelDifficulty, level: Level, solutio
             overlayRows.style.left = "115px";
             overlayRows.style.top = "128px";
             break;
+        case LevelDifficulty.VERY_HARD:
+            overlayRows.style.width = "478px";
+            overlayRows.style.height = "412px";
+            overlayRows.style.left = "111px";
+            overlayRows.style.top = "102px";
+            break;
     }
 
     let evenRowOffset = 0;
@@ -56,14 +62,17 @@ function applySolutionOverlay(difficulty: LevelDifficulty, level: Level, solutio
         case LevelDifficulty.HARD:
             evenRowOffset = 29;
             break;
+        case LevelDifficulty.VERY_HARD:
+            evenRowOffset = 26.5;
+            break;
     }
 
     for (let row = 1; row <= level.rows; row++) {
         const rowDiv = document.createElement("div");
         rowDiv.dataset.row = row.toString();
-        rowDiv.style.flexGrow = "1";
-        rowDiv.style.display = "flex";
-        rowDiv.style.justifyContent = "center";
+
+        rowDiv.style.display = "grid";
+        rowDiv.style.gridTemplateColumns = `repeat(${level.columns}, minmax(0, 1fr))`;
 
         if (row % 2 == 0) {
             rowDiv.style.position = "relative";
@@ -73,7 +82,6 @@ function applySolutionOverlay(difficulty: LevelDifficulty, level: Level, solutio
         for (let column = 1; column <= level.columns; column++) {
             const colDiv = document.createElement("div");
             colDiv.dataset.column = column.toString();
-            colDiv.style.flexGrow = "1";
 
             if (solutionSet.has(`${row},${column}`)) {
                 colDiv.dataset.solution = "true";
