@@ -60,7 +60,7 @@ function applySolutionOverlay(level: Level, solution: Coord[]) {
                 colDiv.style.justifyContent = "center";
 
                 const span = document.createElement("span");
-                span.textContent = "*";
+                span.textContent = "🔘";
                 colDiv.appendChild(span);
             }
 
