@@ -34,6 +34,12 @@ function applySolutionOverlay(difficulty: LevelDifficulty, level: Level, solutio
 
     // medium settings
     switch (difficulty) {
+        case LevelDifficulty.EASY:
+            overlayRows.style.width = "470px";
+            overlayRows.style.height = "240px";
+            overlayRows.style.left = "115px";
+            overlayRows.style.top = "193px";
+            break;
         case LevelDifficulty.MEDIUM:
             overlayRows.style.width = "470px";
             overlayRows.style.height = "475px";
@@ -56,6 +62,9 @@ function applySolutionOverlay(difficulty: LevelDifficulty, level: Level, solutio
 
     let evenRowOffset = 0;
     switch (difficulty) {
+        case LevelDifficulty.EASY:
+            evenRowOffset = 47;
+            break;
         case LevelDifficulty.MEDIUM:
             evenRowOffset = 39;
             break;
