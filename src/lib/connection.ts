@@ -15,13 +15,13 @@ interface WaitingForLevelData {
   ackId: number;
 }
 
-interface ReceivedLevelData {
-  type: "RECEIVED_LEVEL_DATA";
+interface ComputedSolution {
+  type: "COMPUTED_SOLUTION";
   level: Level;
   minimalSolution: Coord[];
 }
 
-export type ConnectionState = ConnectionInit | WaitingForLevelData | ReceivedLevelData;
+export type ConnectionState = ConnectionInit | WaitingForLevelData | ComputedSolution;
 
 export const initialState: ConnectionState = { type: "INIT" };
 
@@ -66,13 +66,13 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
   //   if sending event (generate level) => state waiting for level data
   //   else => state init
   // state waiting for level data
-  //   if receiving ack => state received level data
+  //   if receiving ack => state computed solution
   //   if received getUserScores => init
   //   else => state waiting for level data
-  // state received level data
+  // state computed solution
   //   if sending event (generate level) => state waiting for level data
   //   if received getUserScores => init
-  //   else => state received data
+  //   else => state computed solution
 
   switch (state.type) {
     case "INIT":
@@ -110,7 +110,7 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
         console.log({ minimalSolution });
 
         return {
-          type: "RECEIVED_LEVEL_DATA",
+          type: "COMPUTED_SOLUTION",
           level,
           minimalSolution,
         };
@@ -120,7 +120,7 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
         return initialState;
       }
       return state;
-    case "RECEIVED_LEVEL_DATA":
+    case "COMPUTED_SOLUTION":
       if (socketIOPacketType == SocketIOPacketType.EVENT &&
           Array.isArray(payload) &&
           payload[0] === GG_EVENT_GENERATE_LEVEL &&
