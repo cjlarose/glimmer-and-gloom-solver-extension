@@ -4,6 +4,7 @@ import { SocketIOPacketType } from './socket_io';
 import { Coord } from './coords';
 
 const GG_EVENT_GENERATE_LEVEL = "generateLevel";
+const GG_EVENT_GET_USER_SCORES = "getUserScores";
 
 interface ConnectionInit {
   type: "INIT";
@@ -63,10 +64,15 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
 
   // state init
   //   if sending event (generate level) => state waiting for level data
+  //   else => state init
   // state waiting for level data
   //   if receiving ack => state received level data
-  // state received data
+  //   if received getUserScores => init
+  //   else => state waiting for level data
+  // state received level data
   //   if sending event (generate level) => state waiting for level data
+  //   if received getUserScores => init
+  //   else => state received data
 
   switch (state.type) {
     case "INIT":
@@ -108,6 +114,10 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
           level,
           minimalSolution,
         };
+      } else if (socketIOPacketType == SocketIOPacketType.EVENT &&
+                 Array.isArray(payload) &&
+                 payload[0] === GG_EVENT_GET_USER_SCORES) {
+        return initialState;
       }
       return state;
     case "RECEIVED_LEVEL_DATA":
@@ -119,6 +129,10 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
           type: "WAITING_FOR_LEVEL_DATA",
           ackId
         };
+      } else if (socketIOPacketType == SocketIOPacketType.EVENT &&
+                 Array.isArray(payload) &&
+                 payload[0] === GG_EVENT_GET_USER_SCORES) {
+        return initialState;
       }
       return state;
     default:
