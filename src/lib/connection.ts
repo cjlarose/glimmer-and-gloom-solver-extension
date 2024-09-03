@@ -6,6 +6,14 @@ import { Coord } from './coords';
 const GG_EVENT_GENERATE_LEVEL = "generateLevel";
 const GG_EVENT_GET_USER_SCORES = "getUserScores";
 
+enum LevelDifficulty {
+  EASY = 1,
+  MEDIUM = 2,
+  HARD = 3,
+  VERY_HARD = 4,
+  SPECIAL = 5,
+}
+
 interface ConnectionInit {
   type: "INIT";
 }
@@ -13,10 +21,12 @@ interface ConnectionInit {
 interface WaitingForLevelData {
   type: "WAITING_FOR_LEVEL_DATA";
   ackId: number;
+  difficulty: LevelDifficulty;
 }
 
 interface ComputedSolution {
   type: "COMPUTED_SOLUTION";
+  difficulty: LevelDifficulty;
   level: Level;
   minimalSolution: Coord[];
 }
@@ -80,10 +90,14 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
           Array.isArray(payload) &&
           payload[0] === GG_EVENT_GENERATE_LEVEL &&
           ackId !== null) {
-        return {
-          type: "WAITING_FOR_LEVEL_DATA",
-          ackId
-        };
+        const difficulty = payload[1];
+        if (Number.isInteger(difficulty) && difficulty >= LevelDifficulty.EASY && difficulty <= LevelDifficulty.VERY_HARD) {
+          return {
+            type: "WAITING_FOR_LEVEL_DATA",
+            ackId,
+            difficulty,
+          };
+        }
       }
       return state;
     case "WAITING_FOR_LEVEL_DATA":
@@ -111,6 +125,7 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
 
         return {
           type: "COMPUTED_SOLUTION",
+          difficulty: state.difficulty,
           level,
           minimalSolution,
         };
@@ -125,10 +140,16 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
           Array.isArray(payload) &&
           payload[0] === GG_EVENT_GENERATE_LEVEL &&
           ackId !== null) {
-        return {
-          type: "WAITING_FOR_LEVEL_DATA",
-          ackId
-        };
+        const difficulty = payload[1];
+        if (Number.isInteger(difficulty) && difficulty >= LevelDifficulty.EASY && difficulty <= LevelDifficulty.VERY_HARD) {
+          return {
+            type: "WAITING_FOR_LEVEL_DATA",
+            ackId,
+            difficulty,
+          };
+        } else {
+          return initialState;
+        }
       } else if (socketIOPacketType == SocketIOPacketType.EVENT &&
                  Array.isArray(payload) &&
                  payload[0] === GG_EVENT_GET_USER_SCORES) {
