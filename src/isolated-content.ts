@@ -1,5 +1,5 @@
 import { SocketIOPacketType } from './lib/socket_io';
-import { ConnectionState } from './lib/connection';
+import { ConnectionState, LevelDifficulty } from './lib/connection';
 import { Level } from './lib/level';
 import { Coord } from './lib/coords';
 
@@ -12,7 +12,7 @@ function clearOverlay() {
     }
 }
 
-function applySolutionOverlay(level: Level, solution: Coord[]) {
+function applySolutionOverlay(difficulty: LevelDifficulty, level: Level, solution: Coord[]) {
     const tileSet = new Set(level.tiles.map(({ row, column }) => `${row},${column}`));
     const solutionSet = new Set(solution.map(({ row, column }) => `${row},${column}`));
 
@@ -26,26 +26,48 @@ function applySolutionOverlay(level: Level, solution: Coord[]) {
     const overlay = document.createDocumentFragment();
     const overlayRows = document.createElement("div");
     overlayRows.classList.add("solution-overlay");
+
     overlayRows.style.pointerEvents = "none";
+    overlayRows.style.position = "absolute";
+    overlayRows.style.display = "grid";
+    overlayRows.style.gridAutoRows = "1fr";
 
     // medium settings
-    overlayRows.style.width = "470px";
-    overlayRows.style.height = "475px";
-    overlayRows.style.position = "absolute";
-    overlayRows.style.left = "115px";
-    overlayRows.style.top = "75px";
-    overlayRows.style.display = "flex";
-    overlayRows.style.flexDirection = "column";
+    switch (difficulty) {
+        case LevelDifficulty.MEDIUM:
+            overlayRows.style.width = "470px";
+            overlayRows.style.height = "475px";
+            overlayRows.style.left = "115px";
+            overlayRows.style.top = "75px";
+            break;
+        case LevelDifficulty.HARD:
+            overlayRows.style.width = "470px";
+            overlayRows.style.height = "361px";
+            overlayRows.style.left = "115px";
+            overlayRows.style.top = "128px";
+            break;
+    }
+
+    let evenRowOffset = 0;
+    switch (difficulty) {
+        case LevelDifficulty.MEDIUM:
+            evenRowOffset = 39;
+            break;
+        case LevelDifficulty.HARD:
+            evenRowOffset = 29;
+            break;
+    }
 
     for (let row = 1; row <= level.rows; row++) {
         const rowDiv = document.createElement("div");
         rowDiv.dataset.row = row.toString();
         rowDiv.style.flexGrow = "1";
         rowDiv.style.display = "flex";
+        rowDiv.style.justifyContent = "center";
 
         if (row % 2 == 0) {
             rowDiv.style.position = "relative";
-            rowDiv.style.left = "39px";
+            rowDiv.style.left = `${evenRowOffset}px`;
         }
 
         for (let column = 1; column <= level.columns; column++) {
@@ -82,8 +104,8 @@ function handleConnectionState(connectionState: ConnectionState) {
   clearOverlay();
   switch (connectionState.type) {
     case "COMPUTED_SOLUTION": {
-      const { level, minimalSolution } = connectionState;
-      applySolutionOverlay(level, minimalSolution);
+      const { difficulty, level, minimalSolution } = connectionState;
+      applySolutionOverlay(difficulty, level, minimalSolution);
       break;
     }
   }

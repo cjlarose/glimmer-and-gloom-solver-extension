@@ -6,7 +6,7 @@ import { Coord } from './coords';
 const GG_EVENT_GENERATE_LEVEL = "generateLevel";
 const GG_EVENT_GET_USER_SCORES = "getUserScores";
 
-enum LevelDifficulty {
+export enum LevelDifficulty {
   EASY = 1,
   MEDIUM = 2,
   HARD = 3,
