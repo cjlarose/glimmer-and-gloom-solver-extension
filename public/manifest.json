@@ -9,7 +9,7 @@
   },
   "content_scripts": [
     {
-      "js": ["scripts/socket-sniffer.js"],
+      "js": ["scripts/websocket-tap.js"],
       "matches": [
         "https://www1.flightrising.com/play/glimmer-and-gloom"
       ],
