@@ -1,6 +1,6 @@
 {
-  "name": "Hello Extensions",
-  "description": "Base Level Extension",
+  "name": "Glimmer & Gloom Solver",
+  "description": "Displays a solution overlay for Glimmer & Gloom on FlightRising",
   "version": "1.0",
   "manifest_version": 3,
   "action": {
