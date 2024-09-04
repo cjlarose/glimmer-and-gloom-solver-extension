@@ -179,9 +179,6 @@ window.addEventListener("message", function(event) {
 
   const message = { socketIOPacketType, ackId, payload };
   chrome.runtime.sendMessage(message, function(response: ConnectionState) {
-      console.log("(received) Content script got response from service worker");
-      console.log({ response });
-
       handleConnectionState(response);
   });
 });

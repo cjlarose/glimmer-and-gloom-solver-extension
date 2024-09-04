@@ -70,8 +70,6 @@ export interface Message {
 }
 
 export function handlePacket(state: ConnectionState = initialState, message: Message): ConnectionState {
-  console.log({ state, message });
-
   const { socketIOPacketType, ackId, payload } = message;
 
   // state init
@@ -108,23 +106,16 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
           ackId === state.ackId &&
           Array.isArray(payload)) {
         const level = parseLevel(payload[0]);
-        console.log({ level });
 
         const solutionCoords = [TileState.DARK, TileState.LIGHT].flatMap(desiredState => {
             const augmentedMatrix = generateAugmentedMatrix(level, desiredState);
-            console.log({ augmentedMatrix });
             const solutions = solveMod2Matrix(augmentedMatrix);
-            console.log({ solutions });
             return getSolutionCoordinates(level, solutions);
         });
-
-        console.log({ solutionCoords });
 
         const minimalSolution = solutionCoords.reduce((minSolution, currentSolution) => {
             return currentSolution.length < minSolution.length ? currentSolution : minSolution;
         }, solutionCoords[0]);
-
-        console.log({ minimalSolution });
 
         return {
           type: "COMPUTED_SOLUTION",
