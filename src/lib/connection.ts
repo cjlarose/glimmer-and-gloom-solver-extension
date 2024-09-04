@@ -5,6 +5,7 @@ import { Coord } from './coords';
 
 const GG_EVENT_GENERATE_LEVEL = "generateLevel";
 const GG_EVENT_GET_USER_SCORES = "getUserScores";
+const GG_EVENT_RECORD_MOVE = "recordMove";
 
 export enum LevelDifficulty {
   EASY = 1,
@@ -29,6 +30,7 @@ interface ComputedSolution {
   difficulty: LevelDifficulty;
   level: Level;
   minimalSolution: Coord[];
+  clickedCoords: Coord[];
 }
 
 export type ConnectionState = ConnectionInit | WaitingForLevelData | ComputedSolution;
@@ -81,6 +83,7 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
   //   else => state waiting for level data
   // state computed solution
   //   if sending event (generate level) => state waiting for level data
+  //   if sending event (record move) => update clicked coords, state computed solution
   //   if received getUserScores => init
   //   else => state computed solution
 
@@ -128,6 +131,7 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
           difficulty: state.difficulty,
           level,
           minimalSolution,
+          clickedCoords: [],
         };
       } else if (socketIOPacketType == SocketIOPacketType.EVENT &&
                  Array.isArray(payload) &&
@@ -154,6 +158,18 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
                  Array.isArray(payload) &&
                  payload[0] === GG_EVENT_GET_USER_SCORES) {
         return initialState;
+      } else if (socketIOPacketType == SocketIOPacketType.EVENT &&
+                 Array.isArray(payload) &&
+                 payload[0] === GG_EVENT_RECORD_MOVE) {
+        const [ row, column ] = payload[1];
+        const newClickedCoords = state.clickedCoords.find(coord => coord.row == row && coord.column == column)
+          ? state.clickedCoords.filter(coord => coord.row !== row || coord.column !== column)
+          : [...state.clickedCoords, { row, column }];
+
+        return {
+          ...state,
+          clickedCoords: newClickedCoords,
+        };
       }
       return state;
     default:

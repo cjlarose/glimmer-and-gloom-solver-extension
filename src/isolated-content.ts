@@ -12,9 +12,23 @@ function clearOverlay() {
     }
 }
 
-function applySolutionOverlay(difficulty: LevelDifficulty, level: Level, solution: Coord[]) {
+function symmetricDifference<T>(setA: Set<T>, setB: Set<T>): Set<T> {
+    const difference = new Set(setA);
+    for (const elem of setB) {
+        if (difference.has(elem)) {
+            difference.delete(elem);
+        } else {
+            difference.add(elem);
+        }
+    }
+    return difference;
+}
+
+function applySolutionOverlay(difficulty: LevelDifficulty, level: Level, solution: Coord[], clickedCoords: Coord[]) {
     const tileSet = new Set(level.tiles.map(({ row, column }) => `${row},${column}`));
     const solutionSet = new Set(solution.map(({ row, column }) => `${row},${column}`));
+    const clickedSet = new Set(clickedCoords.map(({ row, column }) => `${row},${column}`));
+    const remainingToClick = symmetricDifference(solutionSet, clickedSet);
 
     const frame = document.querySelector<HTMLElement>("#glimmer-gloom-frame");
     if (!frame) {
@@ -92,7 +106,7 @@ function applySolutionOverlay(difficulty: LevelDifficulty, level: Level, solutio
             const colDiv = document.createElement("div");
             colDiv.dataset.column = column.toString();
 
-            if (solutionSet.has(`${row},${column}`)) {
+            if (remainingToClick.has(`${row},${column}`)) {
                 colDiv.dataset.solution = "true";
                 colDiv.style.display = "flex";
                 colDiv.style.flexDirection = "column";
@@ -121,8 +135,8 @@ function handleConnectionState(connectionState: ConnectionState) {
   clearOverlay();
   switch (connectionState.type) {
     case "COMPUTED_SOLUTION": {
-      const { difficulty, level, minimalSolution } = connectionState;
-      applySolutionOverlay(difficulty, level, minimalSolution);
+      const { difficulty, level, minimalSolution, clickedCoords } = connectionState;
+      applySolutionOverlay(difficulty, level, minimalSolution, clickedCoords);
       break;
     }
   }
