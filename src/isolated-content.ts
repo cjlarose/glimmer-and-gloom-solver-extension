@@ -178,13 +178,17 @@ window.addEventListener("message", function(event) {
   const payload = JSON.parse(engineIOPacket.slice(index));
 
   const message = { socketIOPacketType, ackId, payload };
-  chrome.runtime.sendMessage(message, function(response: ConnectionState) {
-      handleConnectionState(response);
-  });
+  chrome.runtime.sendMessage(message);
 });
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, _, sendResponse) {
     if (request.message == 'isSupported') {
         sendResponse(true)
+        return false;
     }
+
+    const newState: ConnectionState = request;
+    handleConnectionState(newState);
+    sendResponse(true);
+    return false;
 })
