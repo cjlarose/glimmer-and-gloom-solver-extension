@@ -5,6 +5,7 @@ module.exports = {
    entry: {
       background: path.resolve(__dirname, "..", "src", "background.ts"),
       'isolated-content': path.resolve(__dirname, "..", "src", "isolated-content.ts"),
+      'side-panel': path.resolve(__dirname, "..", "src", "side-panel.ts"),
    },
    output: {
       path: path.join(__dirname, "../dist"),

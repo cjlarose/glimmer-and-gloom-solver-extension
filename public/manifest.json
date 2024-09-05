@@ -6,6 +6,9 @@
   "action": {
     "default_popup": "popup.html"
   },
+  "side_panel": {
+    "default_path": "side-panel.html"
+  },
   "content_scripts": [
     {
       "js": ["scripts/websocket-tap.js"],
@@ -27,6 +30,8 @@
     "service_worker": "background.js"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "sidePanel",
+    "tabs"
   ]
 }
