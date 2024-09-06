@@ -24,7 +24,6 @@
   align-items: center;
   background-color: var(--color-hex-default);
   display: flex;
-  fill: white;
   height: var(--hex-height);
   justify-content: center;
   margin: var(--hex-border) 0;
