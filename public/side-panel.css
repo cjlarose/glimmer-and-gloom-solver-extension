@@ -20,6 +20,11 @@
   grid-auto-rows: calc(var(--hex-width) - 28.87px / 2);
   grid-gap: var(--hex-between) var(--hex-between);
   padding-bottom: var(--hex-border);
+  width: calc(
+    var(--hex-width) * var(--hex-columns) + var(--hex-between) *
+      (var(--hex-columns) - 1)
+  );
+  margin: 0 auto;
 }
 
 .hexagon {
