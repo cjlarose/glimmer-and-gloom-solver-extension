@@ -23,7 +23,6 @@
 .hexagon {
   align-items: center;
   background-color: var(--color-hex-default);
-  cursor: pointer;
   display: flex;
   fill: white;
   height: var(--hex-height);
