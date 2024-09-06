@@ -47,13 +47,13 @@ function render(state: UIState) {
   const { level, minimalSolution, clickedCoords } = state.connectionState;
 
   const tileSet = new Set(
-    level.tiles.map(({ row, column }) => `${row},${column}`)
+    level.tiles.map(({ row, column }) => `${row},${column}`),
   );
   const solutionSet = new Set(
-    minimalSolution.map(({ row, column }) => `${row},${column}`)
+    minimalSolution.map(({ row, column }) => `${row},${column}`),
   );
   const clickedSet = new Set(
-    clickedCoords.map(({ row, column }) => `${row},${column}`)
+    clickedCoords.map(({ row, column }) => `${row},${column}`),
   );
   const remainingToClick = symmetricDifference(solutionSet, clickedSet);
 
