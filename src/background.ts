@@ -31,6 +31,10 @@ async function sendUpdatedStateToSubscribers(state: ConnectionState) {
             await removeTabSubscription(tabId);
         }
     }
+
+    for (const port of activePorts) {
+        port.postMessage(state);
+    }
 }
 
 chrome.runtime.onInstalled.addListener(({ reason }) => {
@@ -51,6 +55,12 @@ async function handleMessage(message: Message): Promise<void> {
 chrome.runtime.onMessage.addListener((message: Message, _, sendResponse) => {
     handleMessage(message).then(() => sendResponse(true));
     return true;
+});
+
+const activePorts: chrome.runtime.Port[] = [];
+
+chrome.runtime.onConnect.addListener((port) => {
+    activePorts.push(port);
 });
 
 // Allows users to open the side panel by clicking on the action toolbar icon

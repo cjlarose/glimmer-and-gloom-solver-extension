@@ -1,17 +1,26 @@
+import { ConnectionState } from './lib/connection';
+
 interface Inactive {
-  "type": "INACTIVE";
+  type: "INACTIVE";
 }
 
 interface Active {
-  "type": "ACTIVE";
+  type: "ACTIVE";
+  connectionState: ConnectionState;
 }
 
 type UIState = Inactive | Active;
+
+const initialState: UIState = { type: "INACTIVE" };
 
 function render(state: UIState) {
     const root = document.querySelector<HTMLElement>('#content-root');
     if (!root) {
         return;
+    }
+
+    while (root.firstChild) {
+        root.removeChild(root.firstChild);
     }
 
     if (state.type === "INACTIVE") {
@@ -23,16 +32,18 @@ function render(state: UIState) {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-    let tabData = await chrome.tabs.query({ active: true, currentWindow: true });
-    let tabId = tabData[0].id;
-    if (!tabId) {
-        return;
-    }
+    render(initialState);
 
-    chrome.tabs.sendMessage(tabId, {
-        'message': 'isSupported'
-    }, (isSupported) => {
-        const state: UIState = isSupported ? { type: "ACTIVE" } : { type: "INACTIVE" };
-        render(state);
-    })
+    try {
+        const port = chrome.runtime.connect({ name: "knockknock" });
+        port.onMessage.addListener(function(connectionState: ConnectionState) {
+            const newState: UIState = {
+                type: "ACTIVE",
+                connectionState,
+            };
+            render(newState);
+        });
+    } catch(e) {
+        console.log(`[side-panel] Got error when trying to connect`);
+    }
 })
