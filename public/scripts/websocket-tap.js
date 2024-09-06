@@ -1,5 +1,5 @@
 // https://stackoverflow.com/a/31182643/1231384
-(function() {
+(function () {
   var OrigWebSocket = window.WebSocket;
   var callWebSocket = OrigWebSocket.apply.bind(OrigWebSocket);
   var wsAddListener = OrigWebSocket.prototype.addEventListener;
@@ -13,12 +13,13 @@
       ws = new OrigWebSocket(url);
     } else if (arguments.length >= 2) {
       ws = new OrigWebSocket(url, protocols);
-    } else { // No arguments (browsers will throw an error)
+    } else {
+      // No arguments (browsers will throw an error)
       ws = new OrigWebSocket();
     }
 
-    wsAddListener(ws, 'message', function(event) {
-      window.postMessage({ type: 'WS_MESSAGE_RECEIVED', data: event.data });
+    wsAddListener(ws, "message", function (event) {
+      window.postMessage({ type: "WS_MESSAGE_RECEIVED", data: event.data });
     });
     return ws;
   }.bind();
@@ -27,8 +28,8 @@
 
   var wsSend = OrigWebSocket.prototype.send;
   wsSend = wsSend.apply.bind(wsSend);
-  OrigWebSocket.prototype.send = function(data) {
-    window.postMessage({ type: 'WS_MESSAGE_SENT', data: data });
+  OrigWebSocket.prototype.send = function (data) {
+    window.postMessage({ type: "WS_MESSAGE_SENT", data: data });
     return wsSend(this, arguments);
   };
 })();

@@ -1,4 +1,4 @@
-import { ConnectionState } from './lib/connection';
+import { ConnectionState } from "./lib/connection";
 
 interface Inactive {
   type: "INACTIVE";
@@ -14,36 +14,36 @@ type UIState = Inactive | Active;
 const initialState: UIState = { type: "INACTIVE" };
 
 function render(state: UIState) {
-    const root = document.querySelector<HTMLElement>('#content-root');
-    if (!root) {
-        return;
-    }
+  const root = document.querySelector<HTMLElement>("#content-root");
+  if (!root) {
+    return;
+  }
 
-    while (root.firstChild) {
-        root.removeChild(root.firstChild);
-    }
+  while (root.firstChild) {
+    root.removeChild(root.firstChild);
+  }
 
-    if (state.type === "INACTIVE") {
-        root.appendChild(document.createTextNode("Not enabled"))
-        return;
-    }
+  if (state.type === "INACTIVE") {
+    root.appendChild(document.createTextNode("Not enabled"));
+    return;
+  }
 
-    root.appendChild(document.createTextNode("Enabled"))
+  root.appendChild(document.createTextNode("Enabled"));
 }
 
-window.addEventListener('DOMContentLoaded', async () => {
-    render(initialState);
+window.addEventListener("DOMContentLoaded", async () => {
+  render(initialState);
 
-    try {
-        const port = chrome.runtime.connect({ name: "knockknock" });
-        port.onMessage.addListener(function(connectionState: ConnectionState) {
-            const newState: UIState = {
-                type: "ACTIVE",
-                connectionState,
-            };
-            render(newState);
-        });
-    } catch(e) {
-        console.log(`[side-panel] Got error when trying to connect`);
-    }
-})
+  try {
+    const port = chrome.runtime.connect({ name: "knockknock" });
+    port.onMessage.addListener(function (connectionState: ConnectionState) {
+      const newState: UIState = {
+        type: "ACTIVE",
+        connectionState,
+      };
+      render(newState);
+    });
+  } catch (e) {
+    console.log(`[side-panel] Got error when trying to connect`);
+  }
+});

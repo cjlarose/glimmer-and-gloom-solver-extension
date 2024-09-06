@@ -1,11 +1,23 @@
 // https://www.redblobgames.com/grids/hexagons/#coordinates-offset
 const DIRECTION_DIFFERENCES = [
-    // even rows
-    [[+1,  0], [+1, -1], [ 0, -1],
-     [-1,  0], [ 0, +1], [+1, +1]],
-    // odd rows
-    [[+1,  0], [ 0, -1], [-1, -1],
-     [-1,  0], [-1, +1], [ 0, +1]],
+  // even rows
+  [
+    [+1, 0],
+    [+1, -1],
+    [0, -1],
+    [-1, 0],
+    [0, +1],
+    [+1, +1],
+  ],
+  // odd rows
+  [
+    [+1, 0],
+    [0, -1],
+    [-1, -1],
+    [-1, 0],
+    [-1, +1],
+    [0, +1],
+  ],
 ];
 
 enum DIRECTION {
@@ -46,8 +58,10 @@ export function getAllNeighbors(coord: Coord, level: GridDimensions): Coord[] {
 
     // Check if the neighbor is within the bounds of the level grid (1-indexed)
     if (
-      neighbor.row >= 1 && neighbor.row <= level.rows &&
-      neighbor.column >= 1 && neighbor.column <= level.columns
+      neighbor.row >= 1 &&
+      neighbor.row <= level.rows &&
+      neighbor.column >= 1 &&
+      neighbor.column <= level.columns
     ) {
       neighbors.push(neighbor);
     }

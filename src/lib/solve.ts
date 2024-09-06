@@ -1,7 +1,10 @@
-import { Level, TileState } from './level';
-import { Coord, getAllNeighbors } from './coords';
+import { Level, TileState } from "./level";
+import { Coord, getAllNeighbors } from "./coords";
 
-export function generateAugmentedMatrix(level: Level, desiredState: TileState): number[][] {
+export function generateAugmentedMatrix(
+  level: Level,
+  desiredState: TileState,
+): number[][] {
   // Create a mapping of coordinates to indices in the matrix
   const coordToIndex: Map<string, number> = new Map();
   let index = 0;
@@ -13,24 +16,29 @@ export function generateAugmentedMatrix(level: Level, desiredState: TileState): 
 
   for (const tile of level.tiles) {
     const row: number[] = new Array(level.tiles.length).fill(0);
-    const neighbors = getAllNeighbors({ row: tile.row, column: tile.column }, level);
+    const neighbors = getAllNeighbors(
+      { row: tile.row, column: tile.column },
+      level,
+    );
 
     // Set the coefficient for the current tile
-    const tileIndex = coordToIndex.get(`${tile.row},${tile.column}`)
+    const tileIndex = coordToIndex.get(`${tile.row},${tile.column}`);
     if (tileIndex !== undefined) {
       row[tileIndex] = 1;
     }
 
     // Add coefficients for neighbors
     for (const neighbor of neighbors) {
-      const neighborIndex = coordToIndex.get(`${neighbor.row},${neighbor.column}`);
+      const neighborIndex = coordToIndex.get(
+        `${neighbor.row},${neighbor.column}`,
+      );
       if (neighborIndex !== undefined) {
         row[neighborIndex] = 1;
       }
     }
 
     // Determine the right-hand side of the congruence
-    const targetModulus = (desiredState === tile.status) ? 0 : 1;
+    const targetModulus = desiredState === tile.status ? 0 : 1;
 
     // Append the row to the matrix with the augmented value
     matrix.push([...row, targetModulus]);
@@ -62,7 +70,10 @@ export function solveMod2Matrix(augmentedMatrix: number[][]): number[][] {
 
     // Swap current row with pivot row
     if (pivotRow !== row) {
-      [augmentedMatrix[row], augmentedMatrix[pivotRow]] = [augmentedMatrix[pivotRow], augmentedMatrix[row]];
+      [augmentedMatrix[row], augmentedMatrix[pivotRow]] = [
+        augmentedMatrix[pivotRow],
+        augmentedMatrix[row],
+      ];
     }
 
     // Eliminate all other 1s in this column
@@ -135,7 +146,10 @@ export function solveMod2Matrix(augmentedMatrix: number[][]): number[][] {
   return solutions;
 }
 
-export function getSolutionCoordinates(level: Level, solutions: number[][]): Coord[][] {
+export function getSolutionCoordinates(
+  level: Level,
+  solutions: number[][],
+): Coord[][] {
   // Create a mapping of indices to coordinates
   const coordToIndex: Map<number, Coord> = new Map();
   let index = 0;
@@ -145,10 +159,12 @@ export function getSolutionCoordinates(level: Level, solutions: number[][]): Coo
 
   // Map each solution vector to coordinates
   return solutions.map((solutionVector) => {
-    return solutionVector.map((value, idx) => {
-      if (value === 1) {
-        return coordToIndex.get(idx);
-      }
-    }).filter(coord => coord !== undefined) as Coord[];
+    return solutionVector
+      .map((value, idx) => {
+        if (value === 1) {
+          return coordToIndex.get(idx);
+        }
+      })
+      .filter((coord) => coord !== undefined) as Coord[];
   });
 }

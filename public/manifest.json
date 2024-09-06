@@ -12,26 +12,18 @@
   "content_scripts": [
     {
       "js": ["scripts/websocket-tap.js"],
-      "matches": [
-        "https://www1.flightrising.com/play/glimmer-and-gloom"
-      ],
+      "matches": ["https://www1.flightrising.com/play/glimmer-and-gloom"],
       "world": "MAIN",
       "run_at": "document_start"
     },
     {
       "js": ["isolated-content.js"],
-      "matches": [
-        "https://www1.flightrising.com/play/glimmer-and-gloom"
-      ],
+      "matches": ["https://www1.flightrising.com/play/glimmer-and-gloom"],
       "world": "ISOLATED"
     }
   ],
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": [
-    "storage",
-    "sidePanel",
-    "tabs"
-  ]
+  "permissions": ["storage", "sidePanel", "tabs"]
 }

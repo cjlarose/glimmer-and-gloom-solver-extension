@@ -1,7 +1,11 @@
-import { Level, Tile, TileState } from './level';
-import { generateAugmentedMatrix, solveMod2Matrix, getSolutionCoordinates } from './solve';
-import { SocketIOPacketType } from './socket_io';
-import { Coord } from './coords';
+import { Level, Tile, TileState } from "./level";
+import {
+  generateAugmentedMatrix,
+  solveMod2Matrix,
+  getSolutionCoordinates,
+} from "./solve";
+import { SocketIOPacketType } from "./socket_io";
+import { Coord } from "./coords";
 
 const GG_EVENT_GENERATE_LEVEL = "generateLevel";
 const GG_EVENT_GET_USER_SCORES = "getUserScores";
@@ -33,7 +37,10 @@ interface ComputedSolution {
   clickedCoords: Coord[];
 }
 
-export type ConnectionState = ConnectionInit | WaitingForLevelData | ComputedSolution;
+export type ConnectionState =
+  | ConnectionInit
+  | WaitingForLevelData
+  | ComputedSolution;
 
 export const initialState: ConnectionState = { type: "INIT" };
 
@@ -53,23 +60,26 @@ function parseLevel(levelData: LevelData): Level {
   const tiles: Tile[] = levelData.tiles.map((tile: TileData) => ({
     row: tile.row,
     column: tile.column,
-    status: tile.status === 1 ? TileState.LIGHT : TileState.DARK
+    status: tile.status === 1 ? TileState.LIGHT : TileState.DARK,
   }));
 
   return {
     rows: levelData.rows,
     columns: levelData.columns,
-    tiles
+    tiles,
   };
 }
 
 export interface Message {
-    socketIOPacketType: SocketIOPacketType;
-    ackId: number;
-    payload: any;
+  socketIOPacketType: SocketIOPacketType;
+  ackId: number;
+  payload: any;
 }
 
-export function handlePacket(state: ConnectionState = initialState, message: Message): ConnectionState {
+export function handlePacket(
+  state: ConnectionState = initialState,
+  message: Message,
+): ConnectionState {
   const { socketIOPacketType, ackId, payload } = message;
 
   // state init
@@ -87,12 +97,18 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
 
   switch (state.type) {
     case "INIT":
-      if (socketIOPacketType == SocketIOPacketType.EVENT &&
-          Array.isArray(payload) &&
-          payload[0] === GG_EVENT_GENERATE_LEVEL &&
-          ackId !== null) {
+      if (
+        socketIOPacketType == SocketIOPacketType.EVENT &&
+        Array.isArray(payload) &&
+        payload[0] === GG_EVENT_GENERATE_LEVEL &&
+        ackId !== null
+      ) {
         const difficulty = payload[1];
-        if (Number.isInteger(difficulty) && difficulty >= LevelDifficulty.EASY && difficulty <= LevelDifficulty.VERY_HARD) {
+        if (
+          Number.isInteger(difficulty) &&
+          difficulty >= LevelDifficulty.EASY &&
+          difficulty <= LevelDifficulty.VERY_HARD
+        ) {
           return {
             type: "WAITING_FOR_LEVEL_DATA",
             ackId,
@@ -102,20 +118,32 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
       }
       return state;
     case "WAITING_FOR_LEVEL_DATA":
-      if (socketIOPacketType == SocketIOPacketType.ACK &&
-          ackId === state.ackId &&
-          Array.isArray(payload)) {
+      if (
+        socketIOPacketType == SocketIOPacketType.ACK &&
+        ackId === state.ackId &&
+        Array.isArray(payload)
+      ) {
         const level = parseLevel(payload[0]);
 
-        const solutionCoords = [TileState.DARK, TileState.LIGHT].flatMap(desiredState => {
-            const augmentedMatrix = generateAugmentedMatrix(level, desiredState);
+        const solutionCoords = [TileState.DARK, TileState.LIGHT].flatMap(
+          (desiredState) => {
+            const augmentedMatrix = generateAugmentedMatrix(
+              level,
+              desiredState,
+            );
             const solutions = solveMod2Matrix(augmentedMatrix);
             return getSolutionCoordinates(level, solutions);
-        });
+          },
+        );
 
-        const minimalSolution = solutionCoords.reduce((minSolution, currentSolution) => {
-            return currentSolution.length < minSolution.length ? currentSolution : minSolution;
-        }, solutionCoords[0]);
+        const minimalSolution = solutionCoords.reduce(
+          (minSolution, currentSolution) => {
+            return currentSolution.length < minSolution.length
+              ? currentSolution
+              : minSolution;
+          },
+          solutionCoords[0],
+        );
 
         return {
           type: "COMPUTED_SOLUTION",
@@ -124,19 +152,27 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
           minimalSolution,
           clickedCoords: [],
         };
-      } else if (socketIOPacketType == SocketIOPacketType.EVENT &&
-                 Array.isArray(payload) &&
-                 payload[0] === GG_EVENT_GET_USER_SCORES) {
+      } else if (
+        socketIOPacketType == SocketIOPacketType.EVENT &&
+        Array.isArray(payload) &&
+        payload[0] === GG_EVENT_GET_USER_SCORES
+      ) {
         return initialState;
       }
       return state;
     case "COMPUTED_SOLUTION":
-      if (socketIOPacketType == SocketIOPacketType.EVENT &&
-          Array.isArray(payload) &&
-          payload[0] === GG_EVENT_GENERATE_LEVEL &&
-          ackId !== null) {
+      if (
+        socketIOPacketType == SocketIOPacketType.EVENT &&
+        Array.isArray(payload) &&
+        payload[0] === GG_EVENT_GENERATE_LEVEL &&
+        ackId !== null
+      ) {
         const difficulty = payload[1];
-        if (Number.isInteger(difficulty) && difficulty >= LevelDifficulty.EASY && difficulty <= LevelDifficulty.VERY_HARD) {
+        if (
+          Number.isInteger(difficulty) &&
+          difficulty >= LevelDifficulty.EASY &&
+          difficulty <= LevelDifficulty.VERY_HARD
+        ) {
           return {
             type: "WAITING_FOR_LEVEL_DATA",
             ackId,
@@ -145,16 +181,24 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
         } else {
           return initialState;
         }
-      } else if (socketIOPacketType == SocketIOPacketType.EVENT &&
-                 Array.isArray(payload) &&
-                 payload[0] === GG_EVENT_GET_USER_SCORES) {
+      } else if (
+        socketIOPacketType == SocketIOPacketType.EVENT &&
+        Array.isArray(payload) &&
+        payload[0] === GG_EVENT_GET_USER_SCORES
+      ) {
         return initialState;
-      } else if (socketIOPacketType == SocketIOPacketType.EVENT &&
-                 Array.isArray(payload) &&
-                 payload[0] === GG_EVENT_RECORD_MOVE) {
-        const [ row, column ] = payload[1];
-        const newClickedCoords = state.clickedCoords.find(coord => coord.row == row && coord.column == column)
-          ? state.clickedCoords.filter(coord => coord.row !== row || coord.column !== column)
+      } else if (
+        socketIOPacketType == SocketIOPacketType.EVENT &&
+        Array.isArray(payload) &&
+        payload[0] === GG_EVENT_RECORD_MOVE
+      ) {
+        const [row, column] = payload[1];
+        const newClickedCoords = state.clickedCoords.find(
+          (coord) => coord.row == row && coord.column == column,
+        )
+          ? state.clickedCoords.filter(
+              (coord) => coord.row !== row || coord.column !== column,
+            )
           : [...state.clickedCoords, { row, column }];
 
         return {
@@ -166,4 +210,4 @@ export function handlePacket(state: ConnectionState = initialState, message: Mes
     default:
       return state;
   }
-};
+}

@@ -1,6 +1,6 @@
 export enum TileState {
   DARK,
-  LIGHT
+  LIGHT,
 }
 
 export interface Tile {
