@@ -104,17 +104,11 @@ export function handlePacket(
         ackId !== null
       ) {
         const difficulty = payload[1];
-        if (
-          Number.isInteger(difficulty) &&
-          difficulty >= LevelDifficulty.EASY &&
-          difficulty <= LevelDifficulty.VERY_HARD
-        ) {
-          return {
-            type: "WAITING_FOR_LEVEL_DATA",
-            ackId,
-            difficulty,
-          };
-        }
+        return {
+          type: "WAITING_FOR_LEVEL_DATA",
+          ackId,
+          difficulty,
+        };
       }
       return state;
     case "WAITING_FOR_LEVEL_DATA":
@@ -168,19 +162,11 @@ export function handlePacket(
         ackId !== null
       ) {
         const difficulty = payload[1];
-        if (
-          Number.isInteger(difficulty) &&
-          difficulty >= LevelDifficulty.EASY &&
-          difficulty <= LevelDifficulty.VERY_HARD
-        ) {
-          return {
-            type: "WAITING_FOR_LEVEL_DATA",
-            ackId,
-            difficulty,
-          };
-        } else {
-          return initialState;
-        }
+        return {
+          type: "WAITING_FOR_LEVEL_DATA",
+          ackId,
+          difficulty,
+        };
       } else if (
         socketIOPacketType == SocketIOPacketType.EVENT &&
         Array.isArray(payload) &&
