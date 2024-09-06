@@ -12,6 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/chrome": "^0.0.270",
+    "chrome-location": "^1.2.1",
     "copy-webpack-plugin": "^12.0.2",
     "prettier": "3.3.3",
     "ts-loader": "^9.2.6",

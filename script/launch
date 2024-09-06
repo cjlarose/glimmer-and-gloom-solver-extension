@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -e
+
+main() {
+  cd "${0%/*}/.."
+
+  local chrome_location
+  chrome_location=$(pnpm exec chrome-location)
+
+  local extension_dir
+  extension_dir="$PWD/dist"
+
+  local user_data_dir
+  user_data_dir="$PWD/tmp/chrome-user-data"
+
+  local disk_cache_dir
+  disk_cache_dir="$PWD/tmp/chrome-cache"
+
+  arch -arm64 "$chrome_location" \
+    --disable-background-networking \
+    --disable-background-timer-throttling \
+    --disable-backgrounding-occluded-windows \
+    --disable-breakpad \
+    --disable-client-side-phishing-detection \
+    --disable-default-apps \
+    --disable-dev-shm-usage \
+    --disable-renderer-backgrounding \
+    --disable-sync \
+    --metrics-recording-only \
+    --no-first-run \
+    --no-default-browser-check \
+    --user-data-dir="$user_data_dir" \
+    --disk-cache-dir="$disk_cache_dir" \
+    --load-extension="$extension_dir" \
+    https://www1.flightrising.com/play/glimmer-and-gloom
+}
+
+main
