@@ -1,5 +1,6 @@
 /* https://codepen.io/ericornelissen/pen/vWbWKv */
 .level {
+  --hex-columns: 5;
   --hex-width: 70px;
   --hex-between: 10px;
 
@@ -15,6 +16,7 @@
   --color-hex-light: #f3cf78;
 
   display: grid;
+  grid-template-columns: repeat(var(--hex-columns), var(--hex-width));
   grid-auto-rows: calc(var(--hex-width) - 28.87px / 2);
   grid-gap: var(--hex-between) var(--hex-between);
   padding-bottom: var(--hex-border);

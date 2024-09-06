@@ -64,7 +64,7 @@ function render(state: UIState) {
 
   const levelElement = document.createElement("div");
   levelElement.classList.add("level");
-  levelElement.style.gridTemplateColumns = `repeat(${level.columns}, var(--hex-width))`;
+  levelElement.style.setProperty("--hex-columns", level.columns.toString());
 
   for (let row = 1; row <= level.rows; row++) {
     for (let column = 1; column <= level.columns; column++) {
