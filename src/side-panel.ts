@@ -46,9 +46,6 @@ function render(state: UIState) {
 
   const { level, minimalSolution, clickedCoords } = state.connectionState;
 
-  const tileSet = new Set(
-    level.tiles.map(({ row, column }) => `${row},${column}`),
-  );
   const solutionSet = new Set(
     minimalSolution.map(({ row, column }) => `${row},${column}`),
   );
