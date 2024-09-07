@@ -72,6 +72,15 @@ export function addVectors(a: number[], b: number[]): number[] {
   return a.map((value, idx) => value ^ b[idx]);
 }
 
+export function multiplyMatrixByVector(
+  matrix: number[][],
+  vector: number[],
+): number[] {
+  return matrix.map((row) => {
+    return row.reduce((acc, value, idx) => acc ^ (value & vector[idx]), 0);
+  });
+}
+
 export function generateAugmentedMatrix(
   coefficientMatrix: number[][],
   parityVector: number[],

@@ -7,6 +7,7 @@ import {
   generateInitialLabelingVector,
   addVectors,
   generateCoefficientMatrix,
+  multiplyMatrixByVector,
 } from "./solve";
 import { EngineIOPacketType } from "./engine_io";
 import { SocketIOPacketType } from "./socket_io";
@@ -40,6 +41,7 @@ interface ComputedSolution {
   rows: number;
   columns: number;
   validCoords: Coord[];
+  initialLightCoords: Coord[];
   lightCoords: Coord[];
   minimalSolution: Coord[];
   clickedCoords: Coord[];
@@ -200,6 +202,7 @@ export function handlePacket(
           rows: level.rows,
           columns: level.columns,
           validCoords,
+          initialLightCoords: lightCoords,
           lightCoords,
           minimalSolution,
           clickedCoords: [],
@@ -245,8 +248,47 @@ export function handlePacket(
             )
           : [...state.clickedCoords, { row, column }];
 
+        // Multiplying the coefficient matrix by the vector representing where
+        // the user has clicked gives us a vector where a 0 indicates that the
+        // tile is in the same state as the initial labeling, and a 1 indicates
+        // that the tile has flipped
+
+        const { rows, columns, validCoords, initialLightCoords } = state;
+        const coefficientMatrix = generateCoefficientMatrix(
+          rows,
+          columns,
+          validCoords,
+        );
+        const initialLabelingVector = generateInitialLabelingVector(
+          validCoords,
+          initialLightCoords,
+        );
+        const clickedCoordsVector = generateInitialLabelingVector(
+          validCoords,
+          newClickedCoords,
+        );
+        const flippedCoordsVector = multiplyMatrixByVector(
+          coefficientMatrix,
+          clickedCoordsVector,
+        );
+        const lightCoordsVector = addVectors(
+          flippedCoordsVector,
+          initialLabelingVector,
+        );
+
+        const coordToIndex: Map<string, number> = new Map();
+        let index = 0;
+        for (const tile of validCoords) {
+          coordToIndex.set(`${tile.row},${tile.column}`, index++);
+        }
+        const newLightCoords = validCoords.filter((coord) => {
+          const index = coordToIndex.get(`${coord.row},${coord.column}`);
+          return index !== undefined && lightCoordsVector[index] === 1;
+        });
+
         return {
           ...state,
+          lightCoords: newLightCoords,
           clickedCoords: newClickedCoords,
         };
       }
