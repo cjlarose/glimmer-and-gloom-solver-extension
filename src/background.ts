@@ -8,7 +8,7 @@ import {
 
 async function getConnectionState(): Promise<ConnectionState> {
   const { connectionState } = await chrome.storage.local.get("connectionState");
-  return connectionState;
+  return connectionState === undefined ? initialState : connectionState;
 }
 
 async function sendUpdatedStateToSubscribers(state: ConnectionState) {
@@ -16,14 +16,6 @@ async function sendUpdatedStateToSubscribers(state: ConnectionState) {
     port.postMessage(state);
   }
 }
-
-chrome.runtime.onInstalled.addListener(({ reason }) => {
-  if (reason === "install") {
-    chrome.storage.local.set({
-      connectionState: initialState,
-    });
-  }
-});
 
 async function handleMessage(message: Upgrade | Message): Promise<void> {
   const connectionState = await getConnectionState();
