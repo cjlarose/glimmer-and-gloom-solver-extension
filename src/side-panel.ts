@@ -1,5 +1,6 @@
 import { ConnectionState } from "./lib/connection";
 import { TileState } from "./lib/level";
+import symmetricDifference from "./lib/symmetric-difference";
 
 interface Inactive {
   type: "INACTIVE";
@@ -13,18 +14,6 @@ interface Active {
 type UIState = Inactive | Active;
 
 const initialState: UIState = { type: "INACTIVE" };
-
-function symmetricDifference<T>(setA: Set<T>, setB: Set<T>): Set<T> {
-  const difference = new Set(setA);
-  for (const elem of setB) {
-    if (difference.has(elem)) {
-      difference.delete(elem);
-    } else {
-      difference.add(elem);
-    }
-  }
-  return difference;
-}
 
 function render(state: UIState) {
   const root = document.querySelector<HTMLElement>("#content-root");
