@@ -78,7 +78,7 @@ export interface Upgrade {
 export interface Message {
   engineIOPacketType: EngineIOPacketType.MESSAGE;
   socketIOPacketType: SocketIOPacketType;
-  ackId: number;
+  ackId?: number;
   payload: any;
 }
 
@@ -113,7 +113,7 @@ export function handlePacket(
         socketIOPacketType == SocketIOPacketType.EVENT &&
         Array.isArray(payload) &&
         payload[0] === GG_EVENT_GENERATE_LEVEL &&
-        ackId !== null
+        ackId !== undefined
       ) {
         const difficulty = payload[1];
         return {
@@ -171,7 +171,7 @@ export function handlePacket(
         socketIOPacketType == SocketIOPacketType.EVENT &&
         Array.isArray(payload) &&
         payload[0] === GG_EVENT_GENERATE_LEVEL &&
-        ackId !== null
+        ackId !== undefined
       ) {
         const difficulty = payload[1];
         return {

@@ -1,23 +1,14 @@
 import { EngineIOPacketType } from "./lib/engine_io";
 import { SocketIOPacketType } from "./lib/socket_io";
+import { Upgrade, Message } from "./lib/connection";
 
-window.addEventListener("message", function (event) {
-  // Only accept messages from the same window
-  if (event.source !== window) return;
-
-  // Check if the message is intended for the extension
-  if (event.data === undefined) {
-    return;
-  }
-
-  const engineIOPacket = event.data.data;
+function parseFrame(engineIOPacket: any): Upgrade | Message | undefined {
   const engineIOPacketType = parseInt(engineIOPacket.charAt(0), 10);
 
   if (engineIOPacketType === EngineIOPacketType.UPGRADE) {
-    chrome.runtime.sendMessage({
+    return {
       engineIOPacketType: EngineIOPacketType.UPGRADE,
-    });
-    return;
+    };
   }
 
   if (engineIOPacketType != EngineIOPacketType.MESSAGE) {
@@ -46,13 +37,27 @@ window.addEventListener("message", function (event) {
 
   // Parse the ackId as a number
   const ackId =
-    ackIdDigits.length > 0 ? parseInt(ackIdDigits.join(""), 10) : null;
+    ackIdDigits.length > 0 ? parseInt(ackIdDigits.join(""), 10) : undefined;
 
   // Extract the JSON-encoded payload (everything after the ackId)
   const payload = JSON.parse(engineIOPacket.slice(index));
 
-  const message = { engineIOPacketType, socketIOPacketType, ackId, payload };
-  chrome.runtime.sendMessage(message);
+  return { engineIOPacketType, socketIOPacketType, ackId, payload };
+}
+
+window.addEventListener("message", function (event) {
+  // Only accept messages from the same window
+  if (event.source !== window) return;
+
+  // Check if the message is intended for the extension
+  if (event.data === undefined) {
+    return;
+  }
+
+  const message = parseFrame(event.data.data);
+  if (message !== undefined) {
+    chrome.runtime.sendMessage(message);
+  }
 });
 
 chrome.runtime.onMessage.addListener(function (request, _, sendResponse) {
