@@ -108,7 +108,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   render(initialState);
 
   try {
-    const port = chrome.runtime.connect({ name: "knockknock" });
+    const port = chrome.runtime.connect();
+    port.postMessage(undefined);
     port.onMessage.addListener(function (connectionState: ConnectionState) {
       const newState: UIState = {
         type: "ACTIVE",

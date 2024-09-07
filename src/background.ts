@@ -27,6 +27,11 @@ async function removeTabSubscription(tabId: number) {
   return chrome.storage.local.set({ tabs: [...tabSet] });
 }
 
+async function getConnectionState(): Promise<ConnectionState> {
+  const { connectionState } = await chrome.storage.local.get("connectionState");
+  return connectionState;
+}
+
 async function sendUpdatedStateToSubscribers(state: ConnectionState) {
   const tabs = await getSubscibedTabs();
   for (const tabId of tabs) {
@@ -51,7 +56,7 @@ chrome.runtime.onInstalled.addListener(({ reason }) => {
 });
 
 async function handleMessage(message: Message): Promise<void> {
-  const { connectionState } = await chrome.storage.local.get("connectionState");
+  const connectionState = await getConnectionState();
   const newState = handlePacket(connectionState, message);
   await chrome.storage.local.set({ connectionState: newState });
   return sendUpdatedStateToSubscribers(newState);
@@ -66,6 +71,10 @@ const activePorts: chrome.runtime.Port[] = [];
 
 chrome.runtime.onConnect.addListener((port) => {
   activePorts.push(port);
+  port.onMessage.addListener(async () => {
+    const connectionState = await getConnectionState();
+    port.postMessage(connectionState);
+  });
 });
 
 // Allows users to open the side panel by clicking on the action toolbar icon
