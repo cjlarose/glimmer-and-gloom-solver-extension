@@ -12,7 +12,10 @@ window.addEventListener("message", function (event) {
 
   const engineIOPacket = event.data.data;
   const engineIOPacketType = parseInt(engineIOPacket.charAt(0), 10);
-  if (engineIOPacketType != EngineIOPacketType.MESSAGE) {
+  if (
+    engineIOPacketType != EngineIOPacketType.MESSAGE &&
+    engineIOPacketType != EngineIOPacketType.UPGRADE
+  ) {
     return;
   }
 
@@ -43,7 +46,7 @@ window.addEventListener("message", function (event) {
   // Extract the JSON-encoded payload (everything after the ackId)
   const payload = JSON.parse(engineIOPacket.slice(index));
 
-  const message = { socketIOPacketType, ackId, payload };
+  const message = { engineIOPacketType, socketIOPacketType, ackId, payload };
   chrome.runtime.sendMessage(message);
 });
 

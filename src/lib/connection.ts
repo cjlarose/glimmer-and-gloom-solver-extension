@@ -4,6 +4,7 @@ import {
   solveMod2Matrix,
   getSolutionCoordinates,
 } from "./solve";
+import { EngineIOPacketType } from "./engine_io";
 import { SocketIOPacketType } from "./socket_io";
 import { Coord } from "./coords";
 
@@ -71,6 +72,7 @@ function parseLevel(levelData: LevelData): Level {
 }
 
 export interface Message {
+  engineIOPacketType: EngineIOPacketType;
   socketIOPacketType: SocketIOPacketType;
   ackId: number;
   payload: any;
@@ -80,16 +82,18 @@ export function handlePacket(
   state: ConnectionState = initialState,
   message: Message,
 ): ConnectionState {
-  const { socketIOPacketType, ackId, payload } = message;
+  const { engineIOPacketType, socketIOPacketType, ackId, payload } = message;
 
   // state init
   //   if sending event (generate level) => state waiting for level data
   //   else => state init
   // state waiting for level data
+  //   if received UPGRADE => init
   //   if receiving ack => state computed solution
   //   if received getUserScores => init
   //   else => state waiting for level data
   // state computed solution
+  //   if received UPGRADE => init
   //   if sending event (generate level) => state waiting for level data
   //   if sending event (record move) => update clicked coords, state computed solution
   //   if received getUserScores => init
@@ -112,7 +116,9 @@ export function handlePacket(
       }
       return state;
     case "WAITING_FOR_LEVEL_DATA":
-      if (
+      if (engineIOPacketType == EngineIOPacketType.UPGRADE) {
+        return initialState;
+      } else if (
         socketIOPacketType == SocketIOPacketType.ACK &&
         ackId === state.ackId &&
         Array.isArray(payload)
@@ -155,7 +161,9 @@ export function handlePacket(
       }
       return state;
     case "COMPUTED_SOLUTION":
-      if (
+      if (engineIOPacketType == EngineIOPacketType.UPGRADE) {
+        return initialState;
+      } else if (
         socketIOPacketType == SocketIOPacketType.EVENT &&
         Array.isArray(payload) &&
         payload[0] === GG_EVENT_GENERATE_LEVEL &&
