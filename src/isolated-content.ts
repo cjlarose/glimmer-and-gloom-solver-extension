@@ -24,23 +24,18 @@ function parseFrame(engineIOPacket: any): Upgrade | Message | undefined {
     return;
   }
 
-  // Extract the acknowledgement ID (all digits after the socketIOPacketType)
-  const ackIdDigits: string[] = [];
-  let index = 2; // Start after the socketIOPacketType
-  while (
-    index < engineIOPacket.length &&
-    /\d/.test(engineIOPacket.charAt(index))
-  ) {
-    ackIdDigits.push(engineIOPacket.charAt(index));
-    index++;
+  const pattern = /^(?<ackId>\d+)?(?<payload>\D.*)/;
+  const result = engineIOPacket.slice(2).match(pattern);
+
+  if (result === null) {
+    return;
   }
 
-  // Parse the ackId as a number
   const ackId =
-    ackIdDigits.length > 0 ? parseInt(ackIdDigits.join(""), 10) : undefined;
-
-  // Extract the JSON-encoded payload (everything after the ackId)
-  const payload = JSON.parse(engineIOPacket.slice(index));
+    result.groups?.ackId !== undefined
+      ? parseInt(result.groups?.ackId, 10)
+      : undefined;
+  const payload = JSON.parse(result.groups?.payload);
 
   return { engineIOPacketType, socketIOPacketType, ackId, payload };
 }
