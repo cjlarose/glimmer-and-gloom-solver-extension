@@ -10,6 +10,7 @@
 
   --color-hex-alpha: 1;
   --color-hex-muted-alpha: 0.2;
+  --color-hex-muted-saturation-scale: 0.25;
 
   --color-hex-dark: hsla(
     var(--color-hex-dark-hue),
@@ -19,7 +20,9 @@
   );
   --color-hex-dark-muted: hsla(
     var(--color-hex-dark-hue),
-    var(--color-hex-dark-saturation),
+    calc(
+      var(--color-hex-dark-saturation) * var(--color-hex-muted-saturation-scale)
+    ),
     var(--color-hex-dark-lightness),
     var(--color-hex-muted-alpha)
   );
@@ -32,7 +35,10 @@
   );
   --color-hex-light-muted: hsla(
     var(--color-hex-light-hue),
-    var(--color-hex-light-saturation),
+    calc(
+      var(--color-hex-light-saturation) *
+        var(--color-hex-muted-saturation-scale)
+    ),
     var(--color-hex-light-lightness),
     var(--color-hex-muted-alpha)
   );
