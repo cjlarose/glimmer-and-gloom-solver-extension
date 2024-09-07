@@ -71,8 +71,12 @@ function parseLevel(levelData: LevelData): Level {
   };
 }
 
+export interface Upgrade {
+  engineIOPacketType: EngineIOPacketType.UPGRADE;
+}
+
 export interface Message {
-  engineIOPacketType: EngineIOPacketType;
+  engineIOPacketType: EngineIOPacketType.MESSAGE;
   socketIOPacketType: SocketIOPacketType;
   ackId: number;
   payload: any;
@@ -80,9 +84,13 @@ export interface Message {
 
 export function handlePacket(
   state: ConnectionState = initialState,
-  message: Message,
+  message: Upgrade | Message,
 ): ConnectionState {
-  const { engineIOPacketType, socketIOPacketType, ackId, payload } = message;
+  if (message.engineIOPacketType === EngineIOPacketType.UPGRADE) {
+    return initialState;
+  }
+
+  const { socketIOPacketType, ackId, payload } = message;
 
   // state init
   //   if sending event (generate level) => state waiting for level data
@@ -116,9 +124,7 @@ export function handlePacket(
       }
       return state;
     case "WAITING_FOR_LEVEL_DATA":
-      if (engineIOPacketType == EngineIOPacketType.UPGRADE) {
-        return initialState;
-      } else if (
+      if (
         socketIOPacketType == SocketIOPacketType.ACK &&
         ackId === state.ackId &&
         Array.isArray(payload)
@@ -161,9 +167,7 @@ export function handlePacket(
       }
       return state;
     case "COMPUTED_SOLUTION":
-      if (engineIOPacketType == EngineIOPacketType.UPGRADE) {
-        return initialState;
-      } else if (
+      if (
         socketIOPacketType == SocketIOPacketType.EVENT &&
         Array.isArray(payload) &&
         payload[0] === GG_EVENT_GENERATE_LEVEL &&

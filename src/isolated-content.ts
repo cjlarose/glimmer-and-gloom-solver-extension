@@ -12,10 +12,15 @@ window.addEventListener("message", function (event) {
 
   const engineIOPacket = event.data.data;
   const engineIOPacketType = parseInt(engineIOPacket.charAt(0), 10);
-  if (
-    engineIOPacketType != EngineIOPacketType.MESSAGE &&
-    engineIOPacketType != EngineIOPacketType.UPGRADE
-  ) {
+
+  if (engineIOPacketType === EngineIOPacketType.UPGRADE) {
+    chrome.runtime.sendMessage({
+      engineIOPacketType: EngineIOPacketType.UPGRADE,
+    });
+    return;
+  }
+
+  if (engineIOPacketType != EngineIOPacketType.MESSAGE) {
     return;
   }
 

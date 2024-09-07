@@ -1,4 +1,5 @@
 import {
+  Upgrade,
   Message,
   ConnectionState,
   initialState,
@@ -24,17 +25,19 @@ chrome.runtime.onInstalled.addListener(({ reason }) => {
   }
 });
 
-async function handleMessage(message: Message): Promise<void> {
+async function handleMessage(message: Upgrade | Message): Promise<void> {
   const connectionState = await getConnectionState();
   const newState = handlePacket(connectionState, message);
   await chrome.storage.local.set({ connectionState: newState });
   return sendUpdatedStateToSubscribers(newState);
 }
 
-chrome.runtime.onMessage.addListener((message: Message, _, sendResponse) => {
-  handleMessage(message).then(() => sendResponse(true));
-  return true;
-});
+chrome.runtime.onMessage.addListener(
+  (message: Upgrade | Message, _, sendResponse) => {
+    handleMessage(message).then(() => sendResponse(true));
+    return true;
+  },
+);
 
 const activePorts: chrome.runtime.Port[] = [];
 
