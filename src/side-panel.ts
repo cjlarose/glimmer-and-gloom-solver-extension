@@ -66,7 +66,7 @@ function render(state: UIState) {
   for (let row = 1; row <= level.rows; row++) {
     for (let column = 1; column <= level.columns; column++) {
       const hexagon = document.createElement("div");
-      hexagon.classList.add("hexagon");
+      hexagon.classList.add("hex");
       if (row % 2 === 0) {
         hexagon.classList.add("even-row");
       }
@@ -74,23 +74,28 @@ function render(state: UIState) {
       hexagon.dataset.row = row.toString();
       hexagon.dataset.column = column.toString();
 
-      if (remainingToClick.has(`${row},${column}`)) {
-        hexagon.dataset.solution = "true";
+      const hexIn = document.createElement("div");
+      hexIn.classList.add("hex-in");
 
-        const span = document.createElement("span");
-        span.textContent = "🔘";
-        hexagon.appendChild(span);
-      }
+      const hexLink = document.createElement("a");
+      hexLink.classList.add("hex-link");
 
       const tileStatus = tileStatusMap.get(`${row},${column}`);
       switch (tileStatus) {
         case TileState.DARK:
-          hexagon.classList.add("tile-status-dark");
+          hexLink.classList.add("tile-status-dark");
           break;
         case TileState.LIGHT:
-          hexagon.classList.add("tile-status-light");
+          hexLink.classList.add("tile-status-light");
           break;
       }
+
+      if (remainingToClick.has(`${row},${column}`)) {
+        hexagon.classList.add("click-required");
+      }
+
+      hexIn.appendChild(hexLink);
+      hexagon.appendChild(hexIn);
 
       levelElement.appendChild(hexagon);
     }

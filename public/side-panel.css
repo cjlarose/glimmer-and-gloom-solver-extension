@@ -1,82 +1,68 @@
-/* https://codepen.io/ericornelissen/pen/vWbWKv */
+/* adapted from https://github.com/web-tiki/responsive-grid-of-hexagons */
 .level {
-  --hex-columns: 5;
-  --hex-width: 70px;
-  --hex-between: 10px;
-
-  --hex-height: calc(var(--hex-width) / 1.73 /* sqrt(3) */);
-  --hex-margin: calc(var(--hex-width) / 2);
-  --hex-border: calc(var(--hex-margin) / 1.73 /* sqrt(3) */);
-  --hex-transition: all 0.2s ease;
-
-  --color-hex-default: #ffffff;
-  --color-hex-hover: #ffffff;
-
   --color-hex-dark: #725a87;
   --color-hex-light: #f3cf78;
 
-  display: grid;
-  grid-template-columns: repeat(var(--hex-columns), var(--hex-width));
-  grid-auto-rows: calc(var(--hex-width) - 28.87px / 2);
-  grid-gap: var(--hex-between) var(--hex-between);
-  padding-bottom: var(--hex-border);
-  width: calc(
-    var(--hex-width) * var(--hex-columns) + var(--hex-between) *
-      (var(--hex-columns) - 1)
-  );
-  margin: 0 auto;
-}
-
-.hexagon {
-  align-items: center;
-  background-color: var(--color-hex-default);
   display: flex;
-  height: var(--hex-height);
-  justify-content: center;
-  margin: var(--hex-border) 0;
+  flex-wrap: wrap;
+  width: 90%;
+  margin: 0 auto;
+  overflow: hidden;
+  padding-bottom: 4.4%;
+}
+
+.hex {
   position: relative;
-  transition: var(--hex-transition);
-  width: var(--hex-width);
+  visibility: hidden;
+  outline: 1px solid transparent; /* fix for jagged edges in FF on hover transition */
+  width: calc(100% / var(--hex-columns)); /* = 100 / 10 */
+  opacity: 20%;
 }
-
-.hexagon::after,
-.hexagon::before {
-  border-left: var(--hex-margin) solid transparent;
-  border-right: var(--hex-margin) solid transparent;
+.hex::after {
   content: "";
-  left: 0;
+  display: block;
+  padding-bottom: 86.602%; /* =  100 / tan(60) * 1.5 */
+}
+.hex-in {
   position: absolute;
-  transition: var(--hex-transition);
-  width: 0;
+  width: 96%;
+  padding-bottom: 110.851%; /* =  width / sin(60) */
+  margin: 0 2%;
+  overflow: hidden;
+  visibility: hidden;
+  outline: 1px solid transparent; /* fix for jagged edges in FF on hover transition */
+  -webkit-transform: rotate3d(0, 0, 1, -60deg) skewY(30deg);
+  -ms-transform: rotate3d(0, 0, 1, -60deg) skewY(30deg);
+  transform: rotate3d(0, 0, 1, -60deg) skewY(30deg);
 }
-.hexagon::after {
-  border-top: var(--hex-border) solid var(--color-hex-default);
-  top: 100%;
-  width: 0;
+.hex-in * {
+  position: absolute;
+  visibility: visible;
+  outline: 1px solid transparent; /* fix for jagged edges in FF on hover transition */
 }
-.hexagon::before {
-  border-bottom: var(--hex-border) solid var(--color-hex-default);
-  bottom: 100%;
+.hex-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  overflow: hidden;
+  -webkit-transform: skewY(-30deg) rotate3d(0, 0, 1, 60deg);
+  -ms-transform: skewY(-30deg) rotate3d(0, 0, 1, 60deg);
+  transform: skewY(-30deg) rotate3d(0, 0, 1, 60deg);
 }
 
+/*** EVEN ROW INDENTATION *****************************************************************/
 .even-row {
-  margin-left: calc(var(--hex-width) / 2 + var(--hex-between) / 2);
+  left: calc(50% / var(--hex-columns));
+}
+.click-required {
+  opacity: 100%;
 }
 
+/*** HEXAGON COLORS ******************************************************************************************/
 .tile-status-dark {
   background-color: var(--color-hex-dark);
 }
-.tile-status-dark::after,
-.tile-status-dark::before {
-  border-top-color: var(--color-hex-dark);
-  border-bottom-color: var(--color-hex-dark);
-}
-
 .tile-status-light {
   background-color: var(--color-hex-light);
-}
-.tile-status-light::after,
-.tile-status-light::before {
-  border-top-color: var(--color-hex-light);
-  border-bottom-color: var(--color-hex-light);
 }
