@@ -84,17 +84,14 @@ function render(state: UIState) {
       hexLink.classList.add("hex-link");
 
       const tileStatus = tileStatusMap.get(`${row},${column}`);
+      const muted = !remainingToClick.has(`${row},${column}`);
       switch (tileStatus) {
         case TileState.DARK:
-          hexLink.classList.add("tile-status-dark");
+          hexLink.classList.add(`tile-status-dark${muted ? "-muted" : ""}`);
           break;
         case TileState.LIGHT:
-          hexLink.classList.add("tile-status-light");
+          hexLink.classList.add(`tile-status-light${muted ? "-muted" : ""}`);
           break;
-      }
-
-      if (remainingToClick.has(`${row},${column}`)) {
-        hexagon.classList.add("click-required");
       }
 
       hexIn.appendChild(hexLink);
