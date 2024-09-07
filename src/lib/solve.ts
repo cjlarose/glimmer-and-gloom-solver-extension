@@ -2,23 +2,40 @@ import { Level, TileState } from "./level";
 import { Coord, getAllNeighbors } from "./coords";
 
 export function generateAugmentedMatrix(
-  level: Level,
+  rows: number,
+  columns: number,
+  validCoords: Coord[],
+  lightCoords: Coord[],
   desiredState: TileState,
 ): number[][] {
   // Create a mapping of coordinates to indices in the matrix
   const coordToIndex: Map<string, number> = new Map();
   let index = 0;
-  for (const tile of level.tiles) {
+  for (const tile of validCoords) {
     coordToIndex.set(`${tile.row},${tile.column}`, index++);
+  }
+
+  const lightCoordsSet = new Set<string>();
+  for (const tile of lightCoords) {
+    lightCoordsSet.add(`${tile.row},${tile.column}`);
+  }
+
+  const coordToTileStatus = new Map<string, TileState>();
+  for (const tile of validCoords) {
+    const key = `${tile.row},${tile.column}`;
+    coordToTileStatus.set(
+      key,
+      lightCoordsSet.has(key) ? TileState.LIGHT : TileState.DARK,
+    );
   }
 
   const matrix: number[][] = [];
 
-  for (const tile of level.tiles) {
-    const row: number[] = new Array(level.tiles.length).fill(0);
+  for (const tile of validCoords) {
+    const row: number[] = new Array(validCoords.length).fill(0);
     const neighbors = getAllNeighbors(
       { row: tile.row, column: tile.column },
-      level,
+      { rows, columns },
     );
 
     // Set the coefficient for the current tile
@@ -38,7 +55,8 @@ export function generateAugmentedMatrix(
     }
 
     // Determine the right-hand side of the congruence
-    const targetModulus = desiredState === tile.status ? 0 : 1;
+    const tileStatus = coordToTileStatus.get(`${tile.row},${tile.column}`);
+    const targetModulus = desiredState === tileStatus ? 0 : 1;
 
     // Append the row to the matrix with the augmented value
     matrix.push([...row, targetModulus]);

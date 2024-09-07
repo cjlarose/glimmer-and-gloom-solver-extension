@@ -134,10 +134,21 @@ export function handlePacket(
       ) {
         const level = parseLevel(payload[0]);
 
+        const validCoords = level.tiles.map(({ row, column }) => ({
+          row,
+          column,
+        }));
+        const lightCoords = level.tiles
+          .filter(({ status }) => status === TileState.LIGHT)
+          .map(({ row, column }) => ({ row, column }));
+
         const solutionCoords = [TileState.DARK, TileState.LIGHT].flatMap(
           (desiredState) => {
             const augmentedMatrix = generateAugmentedMatrix(
-              level,
+              level.rows,
+              level.columns,
+              validCoords,
+              lightCoords,
               desiredState,
             );
             const solutions = solveMod2Matrix(augmentedMatrix);
@@ -153,14 +164,6 @@ export function handlePacket(
           },
           solutionCoords[0],
         );
-
-        const validCoords = level.tiles.map(({ row, column }) => ({
-          row,
-          column,
-        }));
-        const lightCoords = level.tiles
-          .filter(({ status }) => status === TileState.LIGHT)
-          .map(({ row, column }) => ({ row, column }));
 
         return {
           type: "COMPUTED_SOLUTION",
