@@ -3,6 +3,10 @@ import {
   generateAugmentedMatrix,
   solveMod2Matrix,
   getSolutionCoordinates,
+  generateDesiredLabelingVector,
+  generateInitialLabelingVector,
+  addVectors,
+  generateCoefficientMatrix,
 } from "./solve";
 import { EngineIOPacketType } from "./engine_io";
 import { SocketIOPacketType } from "./socket_io";
@@ -142,14 +146,39 @@ export function handlePacket(
           .filter(({ status }) => status === TileState.LIGHT)
           .map(({ row, column }) => ({ row, column }));
 
+        // Solve the equation Ax = d + f0, where
+        //   A is the coefficient matrix,
+        //   d is the desired labeling vector,
+        //   f0 is the initial labeling vector.
+        //
+        // We compute f0 and consider both possible values for d,
+        // create an augmented matrix (A | B) where B = d + f0,
+        // and solve the matrix mod 2, giving us all possible indicator
+        // vectors for which tiles need to be clicked.
+
+        const initialLabelingVector = generateInitialLabelingVector(
+          validCoords,
+          lightCoords,
+        );
+        const coefficientMatrix = generateCoefficientMatrix(
+          level.rows,
+          level.columns,
+          validCoords,
+        );
+
         const solutionCoords = [TileState.DARK, TileState.LIGHT].flatMap(
           (desiredState) => {
-            const augmentedMatrix = generateAugmentedMatrix(
-              level.rows,
-              level.columns,
+            const desiredLabelingVector = generateDesiredLabelingVector(
               validCoords,
-              lightCoords,
               desiredState,
+            );
+            const parityVector = addVectors(
+              desiredLabelingVector,
+              initialLabelingVector,
+            );
+            const augmentedMatrix = generateAugmentedMatrix(
+              coefficientMatrix,
+              parityVector,
             );
             const solutions = solveMod2Matrix(augmentedMatrix);
             return getSolutionCoordinates(level, solutions);

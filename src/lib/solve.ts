@@ -1,32 +1,16 @@
 import { Level, TileState } from "./level";
 import { Coord, getAllNeighbors } from "./coords";
 
-export function generateAugmentedMatrix(
+export function generateCoefficientMatrix(
   rows: number,
   columns: number,
   validCoords: Coord[],
-  lightCoords: Coord[],
-  desiredState: TileState,
 ): number[][] {
   // Create a mapping of coordinates to indices in the matrix
   const coordToIndex: Map<string, number> = new Map();
   let index = 0;
   for (const tile of validCoords) {
     coordToIndex.set(`${tile.row},${tile.column}`, index++);
-  }
-
-  const lightCoordsSet = new Set<string>();
-  for (const tile of lightCoords) {
-    lightCoordsSet.add(`${tile.row},${tile.column}`);
-  }
-
-  const coordToTileStatus = new Map<string, TileState>();
-  for (const tile of validCoords) {
-    const key = `${tile.row},${tile.column}`;
-    coordToTileStatus.set(
-      key,
-      lightCoordsSet.has(key) ? TileState.LIGHT : TileState.DARK,
-    );
   }
 
   const matrix: number[][] = [];
@@ -54,15 +38,45 @@ export function generateAugmentedMatrix(
       }
     }
 
-    // Determine the right-hand side of the congruence
-    const tileStatus = coordToTileStatus.get(`${tile.row},${tile.column}`);
-    const targetModulus = desiredState === tileStatus ? 0 : 1;
-
-    // Append the row to the matrix with the augmented value
-    matrix.push([...row, targetModulus]);
+    // Append the row to the matrix
+    matrix.push(row);
   }
 
   return matrix;
+}
+
+export function generateDesiredLabelingVector(
+  validCoords: Coord[],
+  desiredState: TileState,
+): number[] {
+  return new Array(validCoords.length).fill(
+    desiredState === TileState.LIGHT ? 1 : 0,
+  );
+}
+
+export function generateInitialLabelingVector(
+  validCoords: Coord[],
+  lightCoords: Coord[],
+): number[] {
+  const lightCoordsSet = new Set<string>();
+  for (const tile of lightCoords) {
+    lightCoordsSet.add(`${tile.row},${tile.column}`);
+  }
+
+  return validCoords.map((coord) => {
+    return lightCoordsSet.has(`${coord.row},${coord.column}`) ? 1 : 0;
+  });
+}
+
+export function addVectors(a: number[], b: number[]): number[] {
+  return a.map((value, idx) => value ^ b[idx]);
+}
+
+export function generateAugmentedMatrix(
+  coefficientMatrix: number[][],
+  parityVector: number[],
+): number[][] {
+  return coefficientMatrix.map((row, idx) => [...row, parityVector[idx]]);
 }
 
 export function solveMod2Matrix(augmentedMatrix: number[][]): number[][] {
