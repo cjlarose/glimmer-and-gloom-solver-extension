@@ -1,6 +1,5 @@
+import { EngineIOPacketType } from "./lib/engine_io";
 import { SocketIOPacketType } from "./lib/socket_io";
-
-const ENGINE_IO_PACKET_TYPE_MESSAGE = 4;
 
 window.addEventListener("message", function (event) {
   // Only accept messages from the same window
@@ -13,7 +12,7 @@ window.addEventListener("message", function (event) {
 
   const engineIOPacket = event.data.data;
   const engineIOPacketType = parseInt(engineIOPacket.charAt(0), 10);
-  if (engineIOPacketType != ENGINE_IO_PACKET_TYPE_MESSAGE) {
+  if (engineIOPacketType != EngineIOPacketType.MESSAGE) {
     return;
   }
 
