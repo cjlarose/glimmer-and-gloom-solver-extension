@@ -33,8 +33,18 @@ function render(state: UIState) {
     return;
   }
 
-  const { level, minimalSolution, clickedCoords } = state.connectionState;
+  const {
+    rows,
+    columns,
+    validCoords,
+    lightCoords,
+    minimalSolution,
+    clickedCoords,
+  } = state.connectionState;
 
+  const lightSet = new Set(
+    lightCoords.map(({ row, column }) => `${row},${column}`),
+  );
   const solutionSet = new Set(
     minimalSolution.map(({ row, column }) => `${row},${column}`),
   );
@@ -44,16 +54,20 @@ function render(state: UIState) {
   const remainingToClick = symmetricDifference(solutionSet, clickedSet);
 
   const tileStatusMap = new Map<String, TileState>();
-  for (const tile of level.tiles) {
-    tileStatusMap.set(`${tile.row},${tile.column}`, tile.status);
+  for (const tile of validCoords) {
+    const key = `${tile.row},${tile.column}`;
+    tileStatusMap.set(
+      key,
+      lightSet.has(key) ? TileState.LIGHT : TileState.DARK,
+    );
   }
 
   const levelElement = document.createElement("div");
   levelElement.classList.add("level");
-  levelElement.style.setProperty("--hex-columns", level.columns.toString());
+  levelElement.style.setProperty("--hex-columns", columns.toString());
 
-  for (let row = 1; row <= level.rows; row++) {
-    for (let column = 1; column <= level.columns; column++) {
+  for (let row = 1; row <= rows; row++) {
+    for (let column = 1; column <= columns; column++) {
       const hexagon = document.createElement("div");
       hexagon.classList.add("hex");
       if (row % 2 === 0) {

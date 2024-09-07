@@ -33,7 +33,10 @@ interface WaitingForLevelData {
 interface ComputedSolution {
   type: "COMPUTED_SOLUTION";
   difficulty: LevelDifficulty;
-  level: Level;
+  rows: number;
+  columns: number;
+  validCoords: Coord[];
+  lightCoords: Coord[];
   minimalSolution: Coord[];
   clickedCoords: Coord[];
 }
@@ -151,10 +154,21 @@ export function handlePacket(
           solutionCoords[0],
         );
 
+        const validCoords = level.tiles.map(({ row, column }) => ({
+          row,
+          column,
+        }));
+        const lightCoords = level.tiles
+          .filter(({ status }) => status === TileState.LIGHT)
+          .map(({ row, column }) => ({ row, column }));
+
         return {
           type: "COMPUTED_SOLUTION",
           difficulty: state.difficulty,
-          level,
+          rows: level.rows,
+          columns: level.columns,
+          validCoords,
+          lightCoords,
           minimalSolution,
           clickedCoords: [],
         };
