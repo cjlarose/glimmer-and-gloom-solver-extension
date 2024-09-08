@@ -54,10 +54,3 @@ window.addEventListener("message", function (event) {
     chrome.runtime.sendMessage(message);
   }
 });
-
-chrome.runtime.onMessage.addListener(function (request, _, sendResponse) {
-  if (request.message == "isSupported") {
-    sendResponse(true);
-    return false;
-  }
-});
