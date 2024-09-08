@@ -2,7 +2,7 @@ import { EngineIOPacketType } from "./lib/engine_io";
 import { SocketIOPacketType } from "./lib/socket_io";
 import { Upgrade, Message } from "./lib/connection";
 
-function parseFrame(engineIOPacket: any): Upgrade | Message | undefined {
+function parseFrame(engineIOPacket: string): Upgrade | Message | undefined {
   const engineIOPacketType = parseInt(engineIOPacket.charAt(0), 10);
 
   if (engineIOPacketType === EngineIOPacketType.UPGRADE) {
@@ -35,21 +35,32 @@ function parseFrame(engineIOPacket: any): Upgrade | Message | undefined {
     result.groups?.ackId !== undefined
       ? parseInt(result.groups?.ackId, 10)
       : undefined;
-  const payload = JSON.parse(result.groups?.payload);
+  const payload =
+    result.groups?.payload !== undefined
+      ? JSON.parse(result.groups?.payload)
+      : undefined;
 
   return { engineIOPacketType, socketIOPacketType, ackId, payload };
 }
 
-window.addEventListener("message", function (event) {
+window.addEventListener("message", function (event: MessageEvent<any>) {
   // Only accept messages from the same window
   if (event.source !== window) return;
 
-  // Check if the message is intended for the extension
-  if (event.data === undefined) {
+  const payloadType = event.data?.type;
+  if (
+    payloadType !== "WS_MESSAGE_RECEIVED" &&
+    payloadType !== "WS_MESSAGE_SENT"
+  ) {
     return;
   }
 
-  const message = parseFrame(event.data.data);
+  const payload = event.data.data;
+  if (typeof payload !== "string") {
+    return;
+  }
+
+  const message = parseFrame(payload);
   if (message !== undefined) {
     chrome.runtime.sendMessage(message);
   }
