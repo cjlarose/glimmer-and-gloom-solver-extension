@@ -1,10 +1,5 @@
 import { Upgrade, Message, handlePacket } from "./lib/connection";
-import { initialState, ConnectionState } from "./lib/connection_state";
-
-async function getConnectionState(): Promise<ConnectionState> {
-  const { connectionState } = await chrome.storage.local.get("connectionState");
-  return connectionState === undefined ? initialState : connectionState;
-}
+import { getConnectionState } from "./lib/connection_state";
 
 async function handleMessage(message: Upgrade | Message): Promise<void> {
   const connectionState = await getConnectionState();

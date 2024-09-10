@@ -1,4 +1,4 @@
-import { ConnectionState, initialState } from "./lib/connection_state";
+import { ConnectionState, getConnectionState } from "./lib/connection_state";
 import { TileState } from "./lib/level";
 import symmetricDifference from "./lib/symmetric-difference";
 
@@ -86,11 +86,6 @@ function render(state: ConnectionState) {
   }
 
   root.appendChild(levelElement);
-}
-
-async function getConnectionState(): Promise<ConnectionState> {
-  const { connectionState } = await chrome.storage.local.get("connectionState");
-  return connectionState === undefined ? initialState : connectionState;
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
