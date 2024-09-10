@@ -11,17 +11,10 @@ async function getConnectionState(): Promise<ConnectionState> {
   return connectionState === undefined ? initialState : connectionState;
 }
 
-async function sendUpdatedStateToSubscribers(state: ConnectionState) {
-  for (const port of activePorts) {
-    port.postMessage(state);
-  }
-}
-
 async function handleMessage(message: Upgrade | Message): Promise<void> {
   const connectionState = await getConnectionState();
   const newState = handlePacket(connectionState, message);
   await chrome.storage.local.set({ connectionState: newState });
-  return sendUpdatedStateToSubscribers(newState);
 }
 
 chrome.runtime.onMessage.addListener(
@@ -30,16 +23,6 @@ chrome.runtime.onMessage.addListener(
     return true;
   },
 );
-
-const activePorts: chrome.runtime.Port[] = [];
-
-chrome.runtime.onConnect.addListener((port) => {
-  activePorts.push(port);
-  port.onMessage.addListener(async () => {
-    const connectionState = await getConnectionState();
-    port.postMessage(connectionState);
-  });
-});
 
 // Allows users to open the side panel by clicking on the action toolbar icon
 chrome.sidePanel

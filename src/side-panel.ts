@@ -1,21 +1,8 @@
-import { ConnectionState } from "./lib/connection";
+import { ConnectionState, initialState } from "./lib/connection";
 import { TileState } from "./lib/level";
 import symmetricDifference from "./lib/symmetric-difference";
 
-interface Inactive {
-  type: "INACTIVE";
-}
-
-interface Active {
-  type: "ACTIVE";
-  connectionState: ConnectionState;
-}
-
-type UIState = Inactive | Active;
-
-const initialState: UIState = { type: "INACTIVE" };
-
-function render(state: UIState) {
+function render(state: ConnectionState) {
   const root = document.querySelector<HTMLElement>("#content-root");
   if (!root) {
     return;
@@ -25,10 +12,7 @@ function render(state: UIState) {
     root.removeChild(root.firstChild);
   }
 
-  if (
-    state.type === "INACTIVE" ||
-    state.connectionState.type !== "COMPUTED_SOLUTION"
-  ) {
+  if (state.type !== "COMPUTED_SOLUTION") {
     root.appendChild(document.createTextNode("Not enabled"));
     return;
   }
@@ -40,7 +24,7 @@ function render(state: UIState) {
     lightCoords,
     minimalSolution,
     clickedCoords,
-  } = state.connectionState;
+  } = state;
 
   const lightSet = new Set(
     lightCoords.map(({ row, column }) => `${row},${column}`),
@@ -104,20 +88,22 @@ function render(state: UIState) {
   root.appendChild(levelElement);
 }
 
-window.addEventListener("DOMContentLoaded", async () => {
-  render(initialState);
+async function getConnectionState(): Promise<ConnectionState> {
+  const { connectionState } = await chrome.storage.local.get("connectionState");
+  return connectionState === undefined ? initialState : connectionState;
+}
 
-  try {
-    const port = chrome.runtime.connect();
-    port.postMessage(undefined);
-    port.onMessage.addListener(function (connectionState: ConnectionState) {
-      const newState: UIState = {
-        type: "ACTIVE",
-        connectionState,
-      };
-      render(newState);
-    });
-  } catch (e) {
-    console.log(`[side-panel] Got error when trying to connect`);
-  }
+window.addEventListener("DOMContentLoaded", async () => {
+  const currentState = await getConnectionState();
+  render(currentState);
+
+  chrome.storage.local.onChanged.addListener((changes) => {
+    const stateChange = changes["connectionState"];
+
+    if (!stateChange) {
+      return;
+    }
+
+    render(stateChange.newValue);
+  });
 });
