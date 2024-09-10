@@ -131,24 +131,28 @@ export function handlePacket(
           validCoords,
         );
 
-        const solutionCoords = [TileState.DARK, TileState.LIGHT].flatMap(
-          (desiredState) => {
-            const desiredLabelingVector = generateDesiredLabelingVector(
-              validCoords,
-              desiredState,
-            );
-            const parityVector = addVectors(
-              desiredLabelingVector,
-              initialLabelingVector,
-            );
-            const augmentedMatrix = generateAugmentedMatrix(
-              coefficientMatrix,
-              parityVector,
-            );
-            const solutions = solveMod2Matrix(augmentedMatrix);
-            return getSolutionCoordinates(level, solutions);
-          },
-        );
+        let desiredStates = [TileState.DARK, TileState.LIGHT];
+        // Randomly switch dank and light to give both a fair chance
+        if (Math.random() < 0.5) {
+          desiredStates = [TileState.LIGHT, TileState.DARK];
+        }
+
+        const solutionCoords = desiredStates.flatMap((desiredState) => {
+          const desiredLabelingVector = generateDesiredLabelingVector(
+            validCoords,
+            desiredState,
+          );
+          const parityVector = addVectors(
+            desiredLabelingVector,
+            initialLabelingVector,
+          );
+          const augmentedMatrix = generateAugmentedMatrix(
+            coefficientMatrix,
+            parityVector,
+          );
+          const solutions = solveMod2Matrix(augmentedMatrix);
+          return getSolutionCoordinates(level, solutions);
+        });
 
         const minimalSolution = solutionCoords.reduce(
           (minSolution, currentSolution) => {
