@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack --config webpack/webpack.config.js",
     "watch": "webpack --config webpack/webpack.config.js --watch",
-    "zip": "pnpm build && zip -r $npm_package_name-$npm_package_version.zip dist/"
+    "zip": "pnpm build && zip -r $npm_package_name-$(jq -r '.version' public/manifest.json).zip dist/"
   },
   "keywords": [],
   "author": "",
