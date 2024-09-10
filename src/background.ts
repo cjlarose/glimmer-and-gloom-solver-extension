@@ -1,4 +1,5 @@
-import { Upgrade, Message, handlePacket } from "./lib/connection";
+import { handlePacket } from "./lib/connection";
+import { Upgrade, Message } from "./lib/frames";
 import {
   getConnectionState,
   setConnectionState,

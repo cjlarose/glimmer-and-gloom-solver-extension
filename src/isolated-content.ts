@@ -1,6 +1,6 @@
 import { EngineIOPacketType } from "./lib/engine_io";
 import { SocketIOPacketType } from "./lib/socket_io";
-import { Upgrade, Message } from "./lib/connection";
+import { Upgrade, Message } from "./lib/frames";
 
 function parseFrame(engineIOPacket: string): Upgrade | Message | undefined {
   const engineIOPacketType = parseInt(engineIOPacket.charAt(0), 10);

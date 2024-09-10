@@ -12,6 +12,7 @@ import {
 import { EngineIOPacketType } from "./engine_io";
 import { SocketIOPacketType } from "./socket_io";
 import { initialState, ConnectionState } from "./connection_state";
+import { Upgrade, Message } from "./frames";
 
 const GG_EVENT_GENERATE_LEVEL = "generateLevel";
 const GG_EVENT_GET_USER_SCORES = "getUserScores";
@@ -41,17 +42,6 @@ function parseLevel(levelData: LevelData): Level {
     columns: levelData.columns,
     tiles,
   };
-}
-
-export interface Upgrade {
-  engineIOPacketType: EngineIOPacketType.UPGRADE;
-}
-
-export interface Message {
-  engineIOPacketType: EngineIOPacketType.MESSAGE;
-  socketIOPacketType: SocketIOPacketType;
-  ackId?: number;
-  payload: any;
 }
 
 export function handlePacket(
