@@ -54,7 +54,7 @@ export function generateDesiredLabelingVector(
   );
 }
 
-export function generateInitialLabelingVector(
+export function generateIndicatorVector(
   validCoords: Coord[],
   lightCoords: Coord[],
 ): number[] {

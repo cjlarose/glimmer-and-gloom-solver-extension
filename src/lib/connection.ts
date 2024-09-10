@@ -4,7 +4,7 @@ import {
   solveMod2Matrix,
   getSolutionCoordinates,
   generateDesiredLabelingVector,
-  generateInitialLabelingVector,
+  generateIndicatorVector,
   addVectors,
   generateCoefficientMatrix,
   multiplyMatrixByVector,
@@ -121,7 +121,7 @@ export function handlePacket(
         // and solve the matrix mod 2, giving us all possible indicator
         // vectors for which tiles need to be clicked.
 
-        const initialLabelingVector = generateInitialLabelingVector(
+        const initialLabelingVector = generateIndicatorVector(
           validCoords,
           lightCoords,
         );
@@ -222,11 +222,11 @@ export function handlePacket(
           columns,
           validCoords,
         );
-        const initialLabelingVector = generateInitialLabelingVector(
+        const initialLabelingVector = generateIndicatorVector(
           validCoords,
           initialLightCoords,
         );
-        const clickedCoordsVector = generateInitialLabelingVector(
+        const clickedCoordsVector = generateIndicatorVector(
           validCoords,
           newClickedCoords,
         );
