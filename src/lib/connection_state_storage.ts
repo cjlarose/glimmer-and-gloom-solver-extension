@@ -10,3 +10,17 @@ export async function setConnectionState(
 ): Promise<void> {
   await chrome.storage.local.set({ connectionState: state });
 }
+
+export function addStateChangeListener(
+  callback: (connectionState: ConnectionState) => void,
+): void {
+  chrome.storage.local.onChanged.addListener((changes) => {
+    const stateChange = changes["connectionState"];
+
+    if (!stateChange) {
+      return;
+    }
+
+    callback(stateChange.newValue);
+  });
+}

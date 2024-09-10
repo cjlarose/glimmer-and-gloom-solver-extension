@@ -1,5 +1,8 @@
 import { ConnectionState } from "./lib/connection_state";
-import { getConnectionState } from "./lib/connection_state_storage";
+import {
+  getConnectionState,
+  addStateChangeListener,
+} from "./lib/connection_state_storage";
 import { TileState } from "./lib/level";
 import symmetricDifference from "./lib/symmetric-difference";
 
@@ -93,13 +96,5 @@ window.addEventListener("DOMContentLoaded", async () => {
   const currentState = await getConnectionState();
   render(currentState);
 
-  chrome.storage.local.onChanged.addListener((changes) => {
-    const stateChange = changes["connectionState"];
-
-    if (!stateChange) {
-      return;
-    }
-
-    render(stateChange.newValue);
-  });
+  addStateChangeListener(render);
 });
