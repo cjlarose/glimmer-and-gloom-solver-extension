@@ -1,4 +1,4 @@
-## GG Solver
+## Glimmer & Gloom Solver Extension
 
 Browser extension for helping players solve Glimmer and Gloom games on Flight Rising
 
