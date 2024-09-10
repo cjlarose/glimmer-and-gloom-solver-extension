@@ -1,7 +1,7 @@
 {
   "name": "Glimmer & Gloom Solver",
-  "description": "Displays a solution overlay for Glimmer & Gloom on Flight Rising",
-  "version": "1.0",
+  "description": "Suggests optimal solutions to Glimmer & Gloom on Flight Rising",
+  "version": "0.0.1",
   "manifest_version": 3,
   "action": {
     "default_popup": "popup.html"
