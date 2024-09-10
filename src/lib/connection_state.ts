@@ -36,8 +36,3 @@ export type ConnectionState =
   | ComputedSolution;
 
 export const initialState: ConnectionState = { type: "INIT" };
-
-export async function getConnectionState(): Promise<ConnectionState> {
-  const { connectionState } = await chrome.storage.local.get("connectionState");
-  return connectionState === undefined ? initialState : connectionState;
-}

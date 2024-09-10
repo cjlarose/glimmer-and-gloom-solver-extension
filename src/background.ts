@@ -1,5 +1,5 @@
 import { Upgrade, Message, handlePacket } from "./lib/connection";
-import { getConnectionState } from "./lib/connection_state";
+import { getConnectionState } from "./lib/connection_state_storage";
 
 async function handleMessage(message: Upgrade | Message): Promise<void> {
   const connectionState = await getConnectionState();
