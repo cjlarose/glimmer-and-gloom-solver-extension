@@ -1,10 +1,13 @@
 import { Upgrade, Message, handlePacket } from "./lib/connection";
-import { getConnectionState } from "./lib/connection_state_storage";
+import {
+  getConnectionState,
+  setConnectionState,
+} from "./lib/connection_state_storage";
 
 async function handleMessage(message: Upgrade | Message): Promise<void> {
   const connectionState = await getConnectionState();
   const newState = handlePacket(connectionState, message);
-  await chrome.storage.local.set({ connectionState: newState });
+  await setConnectionState(newState);
 }
 
 chrome.runtime.onMessage.addListener(
