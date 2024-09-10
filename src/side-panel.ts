@@ -17,7 +17,9 @@ function render(state: ConnectionState) {
   }
 
   if (state.type !== "COMPUTED_SOLUTION") {
-    root.appendChild(document.createTextNode("Not enabled"));
+    root.appendChild(
+      document.createTextNode("To start, begin a game of Glimmer & Gloom"),
+    );
     return;
   }
 
