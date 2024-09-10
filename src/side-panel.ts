@@ -1,4 +1,4 @@
-import { ConnectionState, initialState } from "./lib/connection";
+import { ConnectionState, initialState } from "./lib/connection_state";
 import { TileState } from "./lib/level";
 import symmetricDifference from "./lib/symmetric-difference";
 

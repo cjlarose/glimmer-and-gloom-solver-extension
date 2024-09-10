@@ -11,48 +11,11 @@ import {
 } from "./solve";
 import { EngineIOPacketType } from "./engine_io";
 import { SocketIOPacketType } from "./socket_io";
-import { Coord } from "./coords";
+import { initialState, ConnectionState } from "./connection_state";
 
 const GG_EVENT_GENERATE_LEVEL = "generateLevel";
 const GG_EVENT_GET_USER_SCORES = "getUserScores";
 const GG_EVENT_RECORD_MOVE = "recordMove";
-
-export enum LevelDifficulty {
-  EASY = 1,
-  MEDIUM = 2,
-  HARD = 3,
-  VERY_HARD = 4,
-  SPECIAL = 5,
-}
-
-interface ConnectionInit {
-  type: "INIT";
-}
-
-interface WaitingForLevelData {
-  type: "WAITING_FOR_LEVEL_DATA";
-  ackId: number;
-  difficulty: LevelDifficulty;
-}
-
-interface ComputedSolution {
-  type: "COMPUTED_SOLUTION";
-  difficulty: LevelDifficulty;
-  rows: number;
-  columns: number;
-  validCoords: Coord[];
-  initialLightCoords: Coord[];
-  lightCoords: Coord[];
-  minimalSolution: Coord[];
-  clickedCoords: Coord[];
-}
-
-export type ConnectionState =
-  | ConnectionInit
-  | WaitingForLevelData
-  | ComputedSolution;
-
-export const initialState: ConnectionState = { type: "INIT" };
 
 interface TileData {
   row: number;
