@@ -10,7 +10,7 @@
 
   --color-hex-alpha: 1;
   --color-hex-muted-alpha: 0.2;
-  --color-hex-muted-saturation-scale: 0.25;
+  --color-hex-muted-saturation-scale: 0.5;
 
   --color-hex-dark: hsla(
     var(--color-hex-dark-hue),
