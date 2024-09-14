@@ -15,6 +15,7 @@ import { initialState, ConnectionState } from "./connection_state";
 import { Upgrade, Message } from "./frames";
 
 const GG_EVENT_GENERATE_LEVEL = "generateLevel";
+const GG_EVENT_RESTART_LEVEL = "restartLevel";
 const GG_EVENT_GET_USER_SCORES = "getUserScores";
 const GG_EVENT_RECORD_MOVE = "recordMove";
 
@@ -55,7 +56,7 @@ export function handlePacket(
   const { socketIOPacketType, ackId, payload } = message;
 
   // state init
-  //   if sending event (generate level) => state waiting for level data
+  //   if sending event (generate/restart level) => state waiting for level data
   //   else => state init
   // state waiting for level data
   //   if received UPGRADE => init
@@ -64,7 +65,7 @@ export function handlePacket(
   //   else => state waiting for level data
   // state computed solution
   //   if received UPGRADE => init
-  //   if sending event (generate level) => state waiting for level data
+  //   if sending event (generate/restart level) => state waiting for level data
   //   if sending event (record move) => update clicked coords, state computed solution
   //   if received getUserScores => init
   //   else => state computed solution
@@ -74,7 +75,7 @@ export function handlePacket(
       if (
         socketIOPacketType == SocketIOPacketType.EVENT &&
         Array.isArray(payload) &&
-        payload[0] === GG_EVENT_GENERATE_LEVEL &&
+        (payload[0] === GG_EVENT_GENERATE_LEVEL || payload[0] === GG_EVENT_RESTART_LEVEL) &&
         ackId !== undefined
       ) {
         const difficulty = payload[1];
@@ -176,7 +177,7 @@ export function handlePacket(
       if (
         socketIOPacketType == SocketIOPacketType.EVENT &&
         Array.isArray(payload) &&
-        payload[0] === GG_EVENT_GENERATE_LEVEL &&
+        (payload[0] === GG_EVENT_GENERATE_LEVEL || payload[0] === GG_EVENT_RESTART_LEVEL) &&
         ackId !== undefined
       ) {
         const difficulty = payload[1];
