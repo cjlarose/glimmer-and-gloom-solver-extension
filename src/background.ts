@@ -1,4 +1,4 @@
-import { handleEvent } from "./lib/connection";
+import { handleEvent } from "./lib/worker_state";
 import { Frame, parseEventFromFrame } from "./lib/frames";
 import { Event } from "./lib/event";
 import { getWorkerState, setWorkerState } from "./lib/worker_state_storage";
