@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-SOURCE=listing-images/glimmer-and-gloom-extension-icon.svg
+SOURCE=listing-images/icon.svg
 
 main() {
   cd "${0%/*}/.."
