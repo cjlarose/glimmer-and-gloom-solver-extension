@@ -10,11 +10,6 @@ export interface HighScoresRequestedEvent {
   type: "HIGH_SCORES_REQUESTED";
 }
 
-export interface LevelRequestedEvent {
-  type: "LEVEL_REQUESTED";
-  ackId: number;
-}
-
 export interface LevelDataReceivedEvent {
   type: "LEVEL_DATA_RECEIVED";
   level: Level;
@@ -33,7 +28,6 @@ export interface PreferencesUpdatedEvent {
 export type Event =
   | ConnectionInitEvent
   | HighScoresRequestedEvent
-  | LevelRequestedEvent
   | LevelDataReceivedEvent
   | PlayerMovedEvent
   | PreferencesUpdatedEvent;

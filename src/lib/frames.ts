@@ -4,8 +4,6 @@ import { Coord } from "./coords";
 import { EngineIOPacketType } from "./engine_io";
 import { SocketIOPacketType } from "./socket_io";
 
-const GG_EVENT_GENERATE_LEVEL = "generateLevel";
-const GG_EVENT_RESTART_LEVEL = "restartLevel";
 const GG_EVENT_GET_USER_SCORES = "getUserScores";
 const GG_EVENT_RECORD_MOVE = "recordMove";
 
@@ -32,16 +30,6 @@ interface LevelData {
   rows: number;
   columns: number;
   tiles: TileData[];
-}
-
-function isLevelRequest(message: Message): boolean {
-  const { socketIOPacketType, payload } = message;
-  return (
-    socketIOPacketType == SocketIOPacketType.EVENT &&
-    Array.isArray(payload) &&
-    (payload[0] === GG_EVENT_GENERATE_LEVEL ||
-      payload[0] === GG_EVENT_RESTART_LEVEL)
-  );
 }
 
 function isLevelData(message: Message): boolean {
@@ -92,11 +80,8 @@ export function parseEventFromFrame(frame: Frame): Event | undefined {
   }
 
   const message: Message = frame;
-  const { ackId, payload } = message;
+  const { payload } = message;
 
-  if (isLevelRequest(message) && ackId !== undefined) {
-    return { type: "LEVEL_REQUESTED", ackId };
-  }
   if (isLevelData(message)) {
     const level = parseLevel(payload[0]);
     return { type: "LEVEL_DATA_RECEIVED", level };

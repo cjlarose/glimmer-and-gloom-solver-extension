@@ -15,11 +15,6 @@ export interface WorkerInit {
   type: "INIT";
 }
 
-export interface WaitingForLevelData {
-  type: "WAITING_FOR_LEVEL_DATA";
-  ackId: number;
-}
-
 export interface ComputedSolution {
   type: "COMPUTED_SOLUTION";
   rows: number;
@@ -31,7 +26,7 @@ export interface ComputedSolution {
   minimalSolution: number[];
 }
 
-export type WorkerState = WorkerInit | WaitingForLevelData | ComputedSolution;
+export type WorkerState = WorkerInit | ComputedSolution;
 
 export const initialState: WorkerState = { type: "INIT" };
 
@@ -140,13 +135,6 @@ function handlePreferencesChanged(
   return handleLevelDataReceived(preferences, level);
 }
 
-function handleLevelRequest(ackId: number): WorkerState {
-  return {
-    type: "WAITING_FOR_LEVEL_DATA",
-    ackId,
-  };
-}
-
 export function handleEvent(
   preferences: Preferences,
   state: WorkerState = initialState,
@@ -155,28 +143,19 @@ export function handleEvent(
   switch (state.type) {
     case "INIT":
       switch (event.type) {
-        case "LEVEL_REQUESTED":
-          return handleLevelRequest(event.ackId);
-        default:
-          return state;
-      }
-    case "WAITING_FOR_LEVEL_DATA":
-      switch (event.type) {
         case "LEVEL_DATA_RECEIVED":
           return handleLevelDataReceived(preferences, event.level);
-        case "HIGH_SCORES_REQUESTED":
-          return initialState;
         default:
           return state;
       }
     case "COMPUTED_SOLUTION":
       switch (event.type) {
-        case "LEVEL_REQUESTED":
-          return handleLevelRequest(event.ackId);
         case "HIGH_SCORES_REQUESTED":
           return initialState;
         case "PLAYER_MOVED":
           return handleMoveRecorded(state, event.coord);
+        case "LEVEL_DATA_RECEIVED":
+          return handleLevelDataReceived(preferences, event.level);
         case "PREFERENCES_UPDATED":
           return handlePreferencesChanged(state, preferences);
         default:
