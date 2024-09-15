@@ -1,4 +1,4 @@
-import { ConnectionState } from "./lib/connection_state";
+import { ConnectionState, ComputedSolution } from "./lib/connection_state";
 import {
   getConnectionState,
   addStateChangeListener,
@@ -42,11 +42,7 @@ function Tile(props: {
   return hexagon;
 }
 
-function Level(state: ConnectionState): Node {
-  if (state.type !== "COMPUTED_SOLUTION") {
-    return document.createTextNode("To start, begin a game of Glimmer & Gloom");
-  }
-
+function Level(state: ComputedSolution): Node {
   const {
     rows,
     columns,
@@ -100,6 +96,13 @@ function render(preferences: Preferences, state: ConnectionState) {
 
   while (root.firstChild) {
     root.removeChild(root.firstChild);
+  }
+
+  if (state.type !== "COMPUTED_SOLUTION") {
+    root.appendChild(
+      document.createTextNode("To start, begin a game of Glimmer & Gloom"),
+    );
+    return;
   }
 
   root.appendChild(Level(state));
