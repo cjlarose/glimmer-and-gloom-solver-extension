@@ -9,6 +9,12 @@ pnpm install
 pnpm build
 ```
 
+To build the browser extension zip
+
+```sh
+pnpm zip
+```
+
 ## Watch
 
 ```sh
