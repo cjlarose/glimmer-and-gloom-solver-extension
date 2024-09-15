@@ -6,7 +6,7 @@ import {
 import { TileState } from "./lib/level";
 import symmetricDifference from "./lib/symmetric-difference";
 
-function renderHexagon(props: {
+function Tile(props: {
   row: number;
   column: number;
   tileState?: TileState;
@@ -42,7 +42,7 @@ function renderHexagon(props: {
   return hexagon;
 }
 
-function renderGame(state: ConnectionState): Node {
+function Level(state: ConnectionState): Node {
   if (state.type !== "COMPUTED_SOLUTION") {
     return document.createTextNode("To start, begin a game of Glimmer & Gloom");
   }
@@ -79,7 +79,7 @@ function renderGame(state: ConnectionState): Node {
 
   for (let row = 1; row <= rows; row++) {
     for (let column = 1; column <= columns; column++) {
-      const hexagon = renderHexagon({
+      const hexagon = Tile({
         row,
         column,
         tileState: tileStateMap.get(`${row},${column}`),
@@ -102,8 +102,7 @@ function render(preferences: Preferences, state: ConnectionState) {
     root.removeChild(root.firstChild);
   }
 
-  const levelElement = renderGame(state);
-  root.appendChild(levelElement);
+  root.appendChild(Level(state));
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
