@@ -1,4 +1,4 @@
-import { Level, Tile, TileState } from "./level";
+import { Level } from "./level";
 import {
   generateAugmentedMatrix,
   solveMod2Matrix,

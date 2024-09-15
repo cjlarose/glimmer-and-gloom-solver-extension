@@ -1,4 +1,3 @@
-import { TileState } from "./level";
 import { Coord, getAllNeighbors } from "./coords";
 
 export function generateCoefficientMatrix(
