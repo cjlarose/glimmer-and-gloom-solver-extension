@@ -1,10 +1,7 @@
 import { handleEvent } from "./lib/connection";
 import { Frame, parseEventFromFrame } from "./lib/frames";
 import { Event } from "./lib/event";
-import {
-  getConnectionState,
-  setConnectionState,
-} from "./lib/connection_state_storage";
+import { getWorkerState, setWorkerState } from "./lib/worker_state_storage";
 import {
   getPreferences,
   addPreferencesChangeListener,
@@ -24,10 +21,10 @@ async function handleMessage(event: Event): Promise<void> {
     if (nextEvent) {
       const [preferences, connectionState] = await Promise.all([
         getPreferences(),
-        getConnectionState(),
+        getWorkerState(),
       ]);
       const newState = handleEvent(preferences, connectionState, nextEvent);
-      await setConnectionState(newState);
+      await setWorkerState(newState);
     }
   }
 

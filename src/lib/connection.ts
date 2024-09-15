@@ -7,11 +7,7 @@ import {
   generateLinearTransformationForClick,
   applyLinearTransformation,
 } from "./solve";
-import {
-  initialState,
-  ConnectionState,
-  ComputedSolution,
-} from "./connection_state";
+import { initialState, WorkerState, ComputedSolution } from "./worker_state";
 import { Preferences } from "./preferences";
 import { Event } from "./event";
 import { Coord } from "./coords";
@@ -19,7 +15,7 @@ import { Coord } from "./coords";
 function handleLevelDataReceived(
   preferences: Preferences,
   level: Level,
-): ConnectionState {
+): WorkerState {
   // Solve the equation Ax = d + f0, where
   //   A is the coefficient matrix,
   //   d is the desired labeling vector,
@@ -76,7 +72,7 @@ function handleLevelDataReceived(
 function handleMoveRecorded(
   state: ComputedSolution,
   coord: Coord,
-): ConnectionState {
+): WorkerState {
   const newChangedCoordsVector = addVectors(
     state.changedCoordsVector,
     generateIndicatorVector(state.validCoords, ({ row, column }) => {
@@ -93,7 +89,7 @@ function handleMoveRecorded(
 function handlePreferencesChanged(
   state: ComputedSolution,
   preferences: Preferences,
-): ConnectionState {
+): WorkerState {
   const {
     rows,
     columns,
@@ -121,7 +117,7 @@ function handlePreferencesChanged(
   return handleLevelDataReceived(preferences, level);
 }
 
-function handleLevelRequest(ackId: number): ConnectionState {
+function handleLevelRequest(ackId: number): WorkerState {
   return {
     type: "WAITING_FOR_LEVEL_DATA",
     ackId,
@@ -130,9 +126,9 @@ function handleLevelRequest(ackId: number): ConnectionState {
 
 export function handleEvent(
   preferences: Preferences,
-  state: ConnectionState = initialState,
+  state: WorkerState = initialState,
   event: Event,
-): ConnectionState {
+): WorkerState {
   switch (state.type) {
     case "INIT":
       switch (event.type) {

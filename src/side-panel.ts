@@ -1,8 +1,8 @@
-import { ConnectionState } from "./lib/connection_state";
+import { WorkerState } from "./lib/worker_state";
 import {
-  getConnectionState,
+  getWorkerState,
   addStateChangeListener,
-} from "./lib/connection_state_storage";
+} from "./lib/worker_state_storage";
 import { Preferences } from "./lib/preferences";
 import {
   addPreferencesChangeListener,
@@ -13,7 +13,7 @@ import SidePanelRoot from "./components/SidePanelRoot";
 
 function render(
   preferences: Preferences,
-  state: ConnectionState,
+  state: WorkerState,
   onPreferencesChanged: (preferences: Preferences) => void,
 ): void {
   const root = document.querySelector<HTMLElement>("#content-root");
@@ -34,7 +34,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   };
   let [preferences, connectionState] = await Promise.all([
     getPreferences(),
-    getConnectionState(),
+    getWorkerState(),
   ]);
   render(preferences, connectionState, onPreferencesChanged);
 

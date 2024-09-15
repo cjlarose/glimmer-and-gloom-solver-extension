@@ -1,6 +1,6 @@
 import { Coord } from "./coords";
 
-export interface ConnectionInit {
+export interface WorkerInit {
   type: "INIT";
 }
 
@@ -20,9 +20,6 @@ export interface ComputedSolution {
   minimalSolution: number[];
 }
 
-export type ConnectionState =
-  | ConnectionInit
-  | WaitingForLevelData
-  | ComputedSolution;
+export type WorkerState = WorkerInit | WaitingForLevelData | ComputedSolution;
 
-export const initialState: ConnectionState = { type: "INIT" };
+export const initialState: WorkerState = { type: "INIT" };

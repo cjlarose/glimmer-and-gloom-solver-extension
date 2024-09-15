@@ -1,11 +1,11 @@
-import { ConnectionState } from "../lib/connection_state";
+import { WorkerState } from "../lib/worker_state";
 import { Preferences } from "../lib/preferences";
 import Level from "./Level";
 import PreferencesForm from "./PreferencesForm";
 
 export default function SidePanelRoot(
   preferences: Preferences,
-  state: ConnectionState,
+  state: WorkerState,
   onPreferencesChanged: (preferences: Preferences) => void,
 ): Node {
   if (state.type !== "COMPUTED_SOLUTION") {

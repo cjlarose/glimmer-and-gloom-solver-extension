@@ -1,4 +1,4 @@
-import { ComputedSolution } from "../lib/connection_state";
+import { ComputedSolution } from "../lib/worker_state";
 import { TileState } from "../lib/level";
 import { addVectors, applyLinearTransformation } from "../lib/solve";
 import Tile from "./Tile";
