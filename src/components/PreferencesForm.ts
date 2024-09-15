@@ -1,3 +1,4 @@
+import { TileState } from "../lib/level";
 import { Preferences } from "../lib/preferences";
 
 export default function PreferencesForm(
@@ -9,51 +10,38 @@ export default function PreferencesForm(
   form.classList.add("preferences-form");
   fragment.appendChild(form);
 
-  const select = document.createElement("select");
-  select.name = "allowedWinners";
+  const label = document.createElement("label");
+  label.htmlFor = "allowed-winner";
+  label.textContent = "Solve for:";
+  form.appendChild(label);
 
-  const anyOption = document.createElement("option");
-  anyOption.value = "any";
-  anyOption.text = "Allow dark or light to win";
-  select.appendChild(anyOption);
+  const select = document.createElement("select");
+  select.name = "allowed-winner";
+  select.id = "allowed-winner";
 
   const darkOption = document.createElement("option");
   darkOption.value = "dark";
-  darkOption.text = "Only allow dark to win";
+  darkOption.text = "Dark";
   select.appendChild(darkOption);
 
   const lightOption = document.createElement("option");
   lightOption.value = "light";
-  lightOption.text = "Only allow light to win";
+  lightOption.text = "Light";
   select.appendChild(lightOption);
 
   form.appendChild(select);
-  if (preferences.allowDarkToWin && preferences.allowLightToWin) {
-    select.value = "any";
-  } else if (preferences.allowDarkToWin) {
-    select.value = "dark";
-  } else {
-    select.value = "light";
-  }
+  select.value = preferences.winner === TileState.DARK ? "dark" : "light";
 
   select.addEventListener("change", () => {
     switch (select.value) {
-      case "any":
-        onPreferencesChanged({
-          allowDarkToWin: true,
-          allowLightToWin: true,
-        });
-        break;
       case "dark":
         onPreferencesChanged({
-          allowDarkToWin: true,
-          allowLightToWin: false,
+          winner: TileState.DARK,
         });
         break;
       case "light":
         onPreferencesChanged({
-          allowDarkToWin: false,
-          allowLightToWin: true,
+          winner: TileState.LIGHT,
         });
         break;
     }

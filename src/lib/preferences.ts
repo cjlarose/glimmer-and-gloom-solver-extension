@@ -1,6 +1,6 @@
+import { TileState } from "./level";
 export const defaultPreferences = {
-  allowDarkToWin: true,
-  allowLightToWin: true,
+  winner: TileState.DARK,
 };
 
 export type Preferences = typeof defaultPreferences;

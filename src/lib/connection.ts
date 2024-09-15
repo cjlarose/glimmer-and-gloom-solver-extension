@@ -121,34 +121,18 @@ function handleLevelDataReceived(
     validCoords,
   );
 
-  let desiredStates: TileState[];
-  if (preferences.allowDarkToWin && preferences.allowLightToWin) {
-    desiredStates = [TileState.DARK, TileState.LIGHT];
-    if (Math.random() < 0.5) {
-      desiredStates = [TileState.LIGHT, TileState.DARK];
-    }
-  } else {
-    desiredStates = [
-      preferences.allowDarkToWin ? TileState.DARK : TileState.LIGHT,
-    ];
-  }
-
-  const solutionCoords = desiredStates.flatMap((desiredState) => {
-    const desiredLabelingVector = generateDesiredLabelingVector(
-      validCoords,
-      desiredState,
-    );
-    const parityVector = addVectors(
-      desiredLabelingVector,
-      initialLabelingVector,
-    );
-    const augmentedMatrix = generateAugmentedMatrix(
-      coefficientMatrix,
-      parityVector,
-    );
-    const solutions = solveMod2Matrix(augmentedMatrix);
-    return getSolutionCoordinates(level, solutions);
-  });
+  const desiredState = preferences.winner;
+  const desiredLabelingVector = generateDesiredLabelingVector(
+    validCoords,
+    desiredState,
+  );
+  const parityVector = addVectors(desiredLabelingVector, initialLabelingVector);
+  const augmentedMatrix = generateAugmentedMatrix(
+    coefficientMatrix,
+    parityVector,
+  );
+  const solutions = solveMod2Matrix(augmentedMatrix);
+  const solutionCoords = getSolutionCoordinates(level, solutions);
 
   const minimalSolution = solutionCoords.reduce(
     (minSolution, currentSolution) => {
