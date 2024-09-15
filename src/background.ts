@@ -1,23 +1,36 @@
 import { handlePacket } from "./lib/connection";
 import { Upgrade, Message } from "./lib/frames";
+import { Event } from "./lib/event";
 import {
   getConnectionState,
   setConnectionState,
 } from "./lib/connection_state_storage";
-import { getPreferences } from "./lib/preferences_storage";
+import {
+  getPreferences,
+  addPreferencesChangeListener,
+} from "./lib/preferences_storage";
+import { Preferences } from "./lib/preferences";
 
-async function handleMessage(message: Upgrade | Message): Promise<void> {
-  const [preferences, connectionState] = await Promise.all([getPreferences(), getConnectionState()]);
-  const newState = handlePacket(preferences, connectionState, message);
+async function handleMessage(event: Event): Promise<void> {
+  const [preferences, connectionState] = await Promise.all([
+    getPreferences(),
+    getConnectionState(),
+  ]);
+  const newState = handlePacket(preferences, connectionState, event);
   await setConnectionState(newState);
 }
 
 chrome.runtime.onMessage.addListener(
-  (message: Upgrade | Message, _, sendResponse) => {
-    handleMessage(message).then(() => sendResponse(true));
+  (frame: Upgrade | Message, _, sendResponse) => {
+    const event: Event = { type: "FRAME", frame };
+    handleMessage(event).then(() => sendResponse(true));
     return true;
   },
 );
+
+addPreferencesChangeListener((preferences: Preferences) => {
+  handleMessage({ type: "PREFERENCES", preferences });
+});
 
 // Allows users to open the side panel by clicking on the action toolbar icon
 chrome.sidePanel

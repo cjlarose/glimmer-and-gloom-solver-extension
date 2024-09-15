@@ -18,7 +18,8 @@ import {
   WaitingForLevelData,
 } from "./connection_state";
 import { Preferences } from "./preferences";
-import { Upgrade, Message } from "./frames";
+import { Message } from "./frames";
+import { Event } from "./event";
 
 const GG_EVENT_GENERATE_LEVEL = "generateLevel";
 const GG_EVENT_RESTART_LEVEL = "restartLevel";
@@ -88,9 +89,10 @@ function parseLevel(levelData: LevelData): Level {
   };
 }
 
-function handleLevelDataReceived(preferences: Preferences, payload: any): ConnectionState {
-  const level = parseLevel(payload[0]);
-
+function handleLevelDataReceived(
+  preferences: Preferences,
+  level: Level,
+): ConnectionState {
   const validCoords = level.tiles.map(({ row, column }) => ({
     row,
     column,
@@ -126,7 +128,9 @@ function handleLevelDataReceived(preferences: Preferences, payload: any): Connec
       desiredStates = [TileState.LIGHT, TileState.DARK];
     }
   } else {
-    desiredStates = [preferences.allowDarkToWin ? TileState.DARK : TileState.LIGHT];
+    desiredStates = [
+      preferences.allowDarkToWin ? TileState.DARK : TileState.LIGHT,
+    ];
   }
 
   const solutionCoords = desiredStates.flatMap((desiredState) => {
@@ -225,6 +229,45 @@ function handleMoveRecorded(
   };
 }
 
+function handlePreferencesChanged(
+  state: ComputedSolution,
+  preferences: Preferences,
+): ConnectionState {
+  const { rows, columns, validCoords, initialLightCoords, clickedCoords } =
+    state;
+  const coefficientMatrix = generateCoefficientMatrix(
+    rows,
+    columns,
+    validCoords,
+  );
+  const initialLabelingVector = generateIndicatorVector(
+    validCoords,
+    initialLightCoords,
+  );
+  const clickedCoordsVector = generateIndicatorVector(
+    validCoords,
+    clickedCoords,
+  );
+  const flippedCoordsVector = multiplyMatrixByVector(
+    coefficientMatrix,
+    clickedCoordsVector,
+  );
+  const lightCoordsVector = addVectors(
+    flippedCoordsVector,
+    initialLabelingVector,
+  );
+  const tiles = validCoords.map((coord) => {
+    const index = validCoords.findIndex(
+      (c) => c.row === coord.row && c.column === coord.column,
+    );
+    const status =
+      lightCoordsVector[index] === 1 ? TileState.LIGHT : TileState.DARK;
+    return { row: coord.row, column: coord.column, status };
+  });
+  const level = { rows, columns, tiles };
+  return handleLevelDataReceived(preferences, level);
+}
+
 function handleLevelRequest(ackId: number): ConnectionState {
   return {
     type: "WAITING_FOR_LEVEL_DATA",
@@ -235,12 +278,21 @@ function handleLevelRequest(ackId: number): ConnectionState {
 export function handlePacket(
   preferences: Preferences,
   state: ConnectionState = initialState,
-  message: Upgrade | Message,
+  event: Event,
 ): ConnectionState {
-  if (message.engineIOPacketType === EngineIOPacketType.UPGRADE) {
+  if (event.type === "PREFERENCES") {
+    if (state.type === "COMPUTED_SOLUTION") {
+      return handlePreferencesChanged(state, preferences);
+    }
+    return state;
+  }
+
+  const frame = event.frame;
+  if (frame.engineIOPacketType === EngineIOPacketType.UPGRADE) {
     return initialState;
   }
 
+  const message: Message = frame;
   const { ackId, payload } = message;
 
   // state init
@@ -266,7 +318,8 @@ export function handlePacket(
       return state;
     case "WAITING_FOR_LEVEL_DATA":
       if (isLevelData(state, message)) {
-        return handleLevelDataReceived(preferences, payload);
+        const level = parseLevel(payload[0]);
+        return handleLevelDataReceived(preferences, level);
       }
       if (isHighScoresRequest(message)) {
         return initialState;
