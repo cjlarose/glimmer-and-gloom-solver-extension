@@ -5,7 +5,7 @@ import {
   generateIndicatorVector,
   addVectors,
   generateLinearTransformationForClick,
-  multiplyMatrixByVector,
+  applyLinearTransformation,
 } from "./solve";
 import { EngineIOPacketType } from "./engine_io";
 import { SocketIOPacketType } from "./socket_io";
@@ -176,7 +176,7 @@ function handlePreferencesChanged(
     changedCoordsVector,
   } = state;
 
-  const flippedCoordsVector = multiplyMatrixByVector(
+  const flippedCoordsVector = applyLinearTransformation(
     coefficientMatrix,
     changedCoordsVector,
   );

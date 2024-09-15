@@ -40,7 +40,7 @@ export function addVectors(a: number[], b: number[]): number[] {
   return a.map((value, idx) => value ^ b[idx]);
 }
 
-export function multiplyMatrixByVector(
+export function applyLinearTransformation(
   matrix: number[][],
   vector: number[],
 ): number[] {

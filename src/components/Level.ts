@@ -1,6 +1,6 @@
 import { ComputedSolution } from "../lib/connection_state";
 import { TileState } from "../lib/level";
-import { addVectors, multiplyMatrixByVector } from "../lib/solve";
+import { addVectors, applyLinearTransformation } from "../lib/solve";
 import Tile from "./Tile";
 
 export default function Level(state: ComputedSolution): Node {
@@ -14,7 +14,7 @@ export default function Level(state: ComputedSolution): Node {
     minimalSolution,
   } = state;
 
-  const flippedCoordsVector = multiplyMatrixByVector(
+  const flippedCoordsVector = applyLinearTransformation(
     coefficientMatrix,
     changedCoordsVector,
   );
