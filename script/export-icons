@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -ex
+
+SOURCE=listing-images/glimmer-and-gloom-extension-icon.svg
+
+main() {
+  cd "${0%/*}/.."
+  
+  for size in $(jq -r '.icons | keys[]' public/manifest.json); do
+    inkscape -o "public/images/icon$size.png" \
+      --export-area-page \
+      --export-width="$size" \
+      --export-height="$size" \
+      "$SOURCE"
+  done
+}
+
+main
