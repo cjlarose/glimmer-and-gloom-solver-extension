@@ -1,5 +1,5 @@
-import { parseEventFromFrame, handleEvent } from "./lib/connection";
-import { Frame } from "./lib/frames";
+import { handleEvent } from "./lib/connection";
+import { Frame, parseEventFromFrame } from "./lib/frames";
 import { Event } from "./lib/event";
 import {
   getConnectionState,
