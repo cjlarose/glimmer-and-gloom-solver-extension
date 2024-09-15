@@ -1,15 +1,15 @@
 import { Coord } from "./coords";
 
-interface ConnectionInit {
+export interface ConnectionInit {
   type: "INIT";
 }
 
-interface WaitingForLevelData {
+export interface WaitingForLevelData {
   type: "WAITING_FOR_LEVEL_DATA";
   ackId: number;
 }
 
-interface ComputedSolution {
+export interface ComputedSolution {
   type: "COMPUTED_SOLUTION";
   rows: number;
   columns: number;
