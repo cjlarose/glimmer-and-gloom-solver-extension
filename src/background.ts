@@ -11,13 +11,27 @@ import {
 } from "./lib/preferences_storage";
 import { Preferences } from "./lib/preferences";
 
+const messageQueue: Event[] = [];
+let isHandlingMessage = false;
+
 async function handleMessage(event: Event): Promise<void> {
-  const [preferences, connectionState] = await Promise.all([
-    getPreferences(),
-    getConnectionState(),
-  ]);
-  const newState = handlePacket(preferences, connectionState, event);
-  await setConnectionState(newState);
+  messageQueue.push(event);
+  if (isHandlingMessage) return;
+  isHandlingMessage = true;
+
+  while (messageQueue.length > 0) {
+    const nextEvent = messageQueue.shift();
+    if (nextEvent) {
+      const [preferences, connectionState] = await Promise.all([
+        getPreferences(),
+        getConnectionState(),
+      ]);
+      const newState = handlePacket(preferences, connectionState, nextEvent);
+      await setConnectionState(newState);
+    }
+  }
+
+  isHandlingMessage = false;
 }
 
 chrome.runtime.onMessage.addListener(
