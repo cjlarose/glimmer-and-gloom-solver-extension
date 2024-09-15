@@ -105,7 +105,7 @@ function handleLevelDataReceived(
 
   const { validCoords, initialLabelingVector } = level;
 
-  const coefficientMatrix = generateLinearTransformationForClick(
+  const linearTransformation = generateLinearTransformationForClick(
     level.rows,
     level.columns,
     validCoords,
@@ -118,7 +118,7 @@ function handleLevelDataReceived(
   );
   const parityVector = addVectors(desiredLabelingVector, initialLabelingVector);
   const augmentedMatrix = generateAugmentedMatrix(
-    coefficientMatrix,
+    linearTransformation,
     parityVector,
   );
   const solutions = solveMod2Matrix(augmentedMatrix);
@@ -139,7 +139,7 @@ function handleLevelDataReceived(
     rows: level.rows,
     columns: level.columns,
     validCoords,
-    coefficientMatrix,
+    linearTransformation,
     initialLabelingVector,
     changedCoordsVector,
     minimalSolution,
@@ -171,13 +171,13 @@ function handlePreferencesChanged(
     rows,
     columns,
     validCoords,
-    coefficientMatrix,
+    linearTransformation,
     initialLabelingVector,
     changedCoordsVector,
   } = state;
 
   const flippedCoordsVector = applyLinearTransformation(
-    coefficientMatrix,
+    linearTransformation,
     changedCoordsVector,
   );
   const tileStateVector = addVectors(

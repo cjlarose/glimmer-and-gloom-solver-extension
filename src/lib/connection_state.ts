@@ -14,7 +14,7 @@ export interface ComputedSolution {
   rows: number;
   columns: number;
   validCoords: Coord[];
-  coefficientMatrix: number[][];
+  linearTransformation: number[][];
   initialLabelingVector: number[];
   changedCoordsVector: number[];
   minimalSolution: number[];

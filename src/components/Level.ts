@@ -8,14 +8,14 @@ export default function Level(state: ComputedSolution): Node {
     rows,
     columns,
     validCoords,
-    coefficientMatrix,
+    linearTransformation,
     initialLabelingVector,
     changedCoordsVector,
     minimalSolution,
   } = state;
 
   const flippedCoordsVector = applyLinearTransformation(
-    coefficientMatrix,
+    linearTransformation,
     changedCoordsVector,
   );
   const tileStateVector = addVectors(
