@@ -5,39 +5,24 @@ export function generateCoefficientMatrix(
   columns: number,
   validCoords: Coord[],
 ): number[][] {
-  // Create a mapping of coordinates to indices in the matrix
-  const coordToIndex: Map<string, number> = new Map();
-  let index = 0;
-  for (const tile of validCoords) {
-    coordToIndex.set(`${tile.row},${tile.column}`, index++);
-  }
-
   const matrix: number[][] = [];
 
   for (const tile of validCoords) {
-    const row: number[] = new Array(validCoords.length).fill(0);
     const neighbors = getAllNeighbors(
       { row: tile.row, column: tile.column },
       { rows, columns },
     );
 
-    // Set the coefficient for the current tile
-    const tileIndex = coordToIndex.get(`${tile.row},${tile.column}`);
-    if (tileIndex !== undefined) {
-      row[tileIndex] = 1;
-    }
-
-    // Add coefficients for neighbors
+    const vertices = new Set<string>();
+    vertices.add(`${tile.row},${tile.column}`);
     for (const neighbor of neighbors) {
-      const neighborIndex = coordToIndex.get(
-        `${neighbor.row},${neighbor.column}`,
-      );
-      if (neighborIndex !== undefined) {
-        row[neighborIndex] = 1;
-      }
+      vertices.add(`${neighbor.row},${neighbor.column}`);
     }
 
-    // Append the row to the matrix
+    const row = generateIndicatorVector(validCoords, (coord) => {
+      return vertices.has(`${coord.row},${coord.column}`) ? 1 : 0;
+    });
+
     matrix.push(row);
   }
 
