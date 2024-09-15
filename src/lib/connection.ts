@@ -133,7 +133,7 @@ function handleLevelDataReceived(
       value.numVertices < acc.numVertices ? value : acc,
     ).solution;
 
-  const changedCoordsVector = generateIndicatorVector(validCoords, []);
+  const changedCoordsVector = generateIndicatorVector(validCoords, () => 0);
 
   return {
     type: "COMPUTED_SOLUTION",
@@ -153,7 +153,9 @@ function handleMoveRecorded(
 ): ConnectionState {
   const newChangedCoordsVector = addVectors(
     state.changedCoordsVector,
-    generateIndicatorVector(state.validCoords, [coord]),
+    generateIndicatorVector(state.validCoords, ({ row, column }) => {
+      return row == coord.row && column == coord.column ? 1 : 0;
+    }),
   );
 
   return {

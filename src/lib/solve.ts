@@ -56,16 +56,9 @@ export function generateDesiredLabelingVector(
 
 export function generateIndicatorVector(
   validCoords: Coord[],
-  lightCoords: Coord[],
+  labeling: (coord: Coord) => number,
 ): number[] {
-  const lightCoordsSet = new Set<string>();
-  for (const tile of lightCoords) {
-    lightCoordsSet.add(`${tile.row},${tile.column}`);
-  }
-
-  return validCoords.map((coord) => {
-    return lightCoordsSet.has(`${coord.row},${coord.column}`) ? 1 : 0;
-  });
+  return validCoords.map(labeling);
 }
 
 export function addVectors(a: number[], b: number[]): number[] {
