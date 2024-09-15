@@ -11,13 +11,10 @@ export default function PreferencesForm(
   fragment.appendChild(form);
 
   const label = document.createElement("label");
-  label.htmlFor = "allowed-winner";
   label.textContent = "Solve for:";
-  form.appendChild(label);
 
   const select = document.createElement("select");
   select.name = "allowed-winner";
-  select.id = "allowed-winner";
 
   const darkOption = document.createElement("option");
   darkOption.value = "dark";
@@ -29,7 +26,9 @@ export default function PreferencesForm(
   lightOption.text = "Light";
   select.appendChild(lightOption);
 
-  form.appendChild(select);
+  label.appendChild(select);
+  form.appendChild(label);
+
   select.value = preferences.winner === TileState.DARK ? "dark" : "light";
 
   select.addEventListener("change", () => {
