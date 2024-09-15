@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -e
+
+pnpm exec tsc
+pnpm exec prettier -c .

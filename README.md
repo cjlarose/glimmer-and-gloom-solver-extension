@@ -26,3 +26,9 @@ pnpm watch
 ```sh
 script/launch
 ```
+
+## Set up git hooks
+
+```sh
+git config core.hooksPath .githooks
+```
