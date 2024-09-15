@@ -11,3 +11,5 @@ export interface Message {
   ackId?: number;
   payload: any;
 }
+
+export type Frame = Upgrade | Message;

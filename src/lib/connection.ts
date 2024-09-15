@@ -13,10 +13,9 @@ import {
   initialState,
   ConnectionState,
   ComputedSolution,
-  WaitingForLevelData,
 } from "./connection_state";
 import { Preferences } from "./preferences";
-import { Message } from "./frames";
+import { Frame, Message } from "./frames";
 import { Event } from "./event";
 import { Coord } from "./coords";
 
@@ -47,12 +46,12 @@ function isLevelRequest(message: Message): boolean {
   );
 }
 
-function isLevelData(state: WaitingForLevelData, message: Message): boolean {
-  const { socketIOPacketType, ackId, payload } = message;
+function isLevelData(message: Message): boolean {
+  const { socketIOPacketType, payload } = message;
   return (
     socketIOPacketType == SocketIOPacketType.ACK &&
-    ackId === state.ackId &&
-    Array.isArray(payload)
+    Array.isArray(payload) &&
+    Array.isArray(payload[0]?.tiles)
   );
 }
 
@@ -201,69 +200,68 @@ function handleLevelRequest(ackId: number): ConnectionState {
   };
 }
 
-export function handlePacket(
-  preferences: Preferences,
-  state: ConnectionState = initialState,
-  event: Event,
-): ConnectionState {
-  if (event.type === "PREFERENCES") {
-    if (state.type === "COMPUTED_SOLUTION") {
-      return handlePreferencesChanged(state, preferences);
-    }
-    return state;
-  }
-
-  const frame = event.frame;
+export function parseEventFromFrame(frame: Frame): Event | undefined {
   if (frame.engineIOPacketType === EngineIOPacketType.UPGRADE) {
-    return initialState;
+    return { type: "CONNECTION_INIT" };
   }
 
   const message: Message = frame;
   const { ackId, payload } = message;
 
-  // state init
-  //   if sending event (generate/restart level) => state waiting for level data
-  //   else => state init
-  // state waiting for level data
-  //   if received UPGRADE => init
-  //   if receiving ack => state computed solution
-  //   if received getUserScores => init
-  //   else => state waiting for level data
-  // state computed solution
-  //   if received UPGRADE => init
-  //   if sending event (generate/restart level) => state waiting for level data
-  //   if sending event (record move) => update clicked coords, state computed solution
-  //   if received getUserScores => init
-  //   else => state computed solution
+  if (isLevelRequest(message) && ackId !== undefined) {
+    return { type: "LEVEL_REQUESTED", ackId };
+  }
+  if (isLevelData(message)) {
+    const level = parseLevel(payload[0]);
+    return { type: "LEVEL_DATA_RECEIVED", level };
+  }
+  if (isHighScoresRequest(message)) {
+    return { type: "HIGH_SCORES_REQUESTED" };
+  }
+  if (isRecordMoveEvent(message)) {
+    const [row, column] = payload[1];
+    const coord: Coord = { row, column };
+    return { type: "PLAYER_MOVED", coord };
+  }
 
+  return undefined;
+}
+
+export function handleEvent(
+  preferences: Preferences,
+  state: ConnectionState = initialState,
+  event: Event,
+): ConnectionState {
   switch (state.type) {
     case "INIT":
-      if (isLevelRequest(message) && ackId !== undefined) {
-        return handleLevelRequest(ackId);
+      switch (event.type) {
+        case "LEVEL_REQUESTED":
+          return handleLevelRequest(event.ackId);
+        default:
+          return state;
       }
-      return state;
     case "WAITING_FOR_LEVEL_DATA":
-      if (isLevelData(state, message)) {
-        const level = parseLevel(payload[0]);
-        return handleLevelDataReceived(preferences, level);
+      switch (event.type) {
+        case "LEVEL_DATA_RECEIVED":
+          return handleLevelDataReceived(preferences, event.level);
+        case "HIGH_SCORES_REQUESTED":
+          return initialState;
+        default:
+          return state;
       }
-      if (isHighScoresRequest(message)) {
-        return initialState;
-      }
-      return state;
     case "COMPUTED_SOLUTION":
-      if (isLevelRequest(message) && ackId !== undefined) {
-        return handleLevelRequest(ackId);
+      switch (event.type) {
+        case "LEVEL_REQUESTED":
+          return handleLevelRequest(event.ackId);
+        case "HIGH_SCORES_REQUESTED":
+          return initialState;
+        case "PLAYER_MOVED":
+          return handleMoveRecorded(state, event.coord);
+        case "PREFERENCES_UPDATED":
+          return handlePreferencesChanged(state, preferences);
+        default:
+          return state;
       }
-      if (isHighScoresRequest(message)) {
-        return initialState;
-      }
-      if (isRecordMoveEvent(message)) {
-        const [row, column] = payload[1];
-        const coord: Coord = { row, column };
-        return handleMoveRecorded(state, coord);
-      }
-      return state;
     default:
       return state;
   }
