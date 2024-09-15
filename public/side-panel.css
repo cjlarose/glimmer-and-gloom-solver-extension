@@ -1,3 +1,15 @@
+.preferences-form {
+  margin-bottom: 1em;
+}
+
+.preferences-form span {
+  margin-right: 10px;
+}
+
+.preferences-form select {
+  padding: 5px;
+}
+
 /* adapted from https://github.com/web-tiki/responsive-grid-of-hexagons */
 .level {
   --color-hex-dark-hue: 272;

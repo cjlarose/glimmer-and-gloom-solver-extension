@@ -11,7 +11,9 @@ export default function PreferencesForm(
   fragment.appendChild(form);
 
   const label = document.createElement("label");
-  label.textContent = "Solve for:";
+  const labelSpan = document.createElement("span");
+  labelSpan.textContent = "Solve for:";
+  label.appendChild(labelSpan);
 
   const select = document.createElement("select");
   select.name = "allowed-winner";
