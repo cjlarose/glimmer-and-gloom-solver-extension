@@ -17,6 +17,7 @@ import {
   ComputedSolution,
   WaitingForLevelData,
 } from "./connection_state";
+import { Preferences } from "./preferences";
 import { Upgrade, Message } from "./frames";
 
 const GG_EVENT_GENERATE_LEVEL = "generateLevel";
@@ -87,7 +88,7 @@ function parseLevel(levelData: LevelData): Level {
   };
 }
 
-function handleLevelDataReceived(payload: any): ConnectionState {
+function handleLevelDataReceived(preferences: Preferences, payload: any): ConnectionState {
   const level = parseLevel(payload[0]);
 
   const validCoords = level.tiles.map(({ row, column }) => ({
@@ -118,10 +119,14 @@ function handleLevelDataReceived(payload: any): ConnectionState {
     validCoords,
   );
 
-  let desiredStates = [TileState.DARK, TileState.LIGHT];
-  // Randomly switch dank and light to give both a fair chance
-  if (Math.random() < 0.5) {
-    desiredStates = [TileState.LIGHT, TileState.DARK];
+  let desiredStates: TileState[];
+  if (preferences.allowDarkToWin && preferences.allowLightToWin) {
+    desiredStates = [TileState.DARK, TileState.LIGHT];
+    if (Math.random() < 0.5) {
+      desiredStates = [TileState.LIGHT, TileState.DARK];
+    }
+  } else {
+    desiredStates = [preferences.allowDarkToWin ? TileState.DARK : TileState.LIGHT];
   }
 
   const solutionCoords = desiredStates.flatMap((desiredState) => {
@@ -228,6 +233,7 @@ function handleLevelRequest(ackId: number): ConnectionState {
 }
 
 export function handlePacket(
+  preferences: Preferences,
   state: ConnectionState = initialState,
   message: Upgrade | Message,
 ): ConnectionState {
@@ -260,7 +266,7 @@ export function handlePacket(
       return state;
     case "WAITING_FOR_LEVEL_DATA":
       if (isLevelData(state, message)) {
-        return handleLevelDataReceived(payload);
+        return handleLevelDataReceived(preferences, payload);
       }
       if (isHighScoresRequest(message)) {
         return initialState;

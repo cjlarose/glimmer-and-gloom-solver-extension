@@ -4,10 +4,11 @@ import {
   getConnectionState,
   setConnectionState,
 } from "./lib/connection_state_storage";
+import { getPreferences } from "./lib/preferences_storage";
 
 async function handleMessage(message: Upgrade | Message): Promise<void> {
-  const connectionState = await getConnectionState();
-  const newState = handlePacket(connectionState, message);
+  const [preferences, connectionState] = await Promise.all([getPreferences(), getConnectionState()]);
+  const newState = handlePacket(preferences, connectionState, message);
   await setConnectionState(newState);
 }
 
