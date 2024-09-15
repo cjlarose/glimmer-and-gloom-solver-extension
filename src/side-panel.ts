@@ -3,6 +3,11 @@ import {
   getConnectionState,
   addStateChangeListener,
 } from "./lib/connection_state_storage";
+import { Preferences } from "./lib/preferences";
+import {
+  addPreferencesChangeListener,
+  getPreferences,
+} from "./lib/preferences_storage";
 import SidePanelRoot from "./components/SidePanelRoot";
 
 function render(preferences: Preferences, state: ConnectionState) {
@@ -15,12 +20,23 @@ function render(preferences: Preferences, state: ConnectionState) {
     root.removeChild(root.firstChild);
   }
 
-  root.appendChild(SidePanelRoot(state));
+  root.appendChild(SidePanelRoot(preferences, state));
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
-  const currentState = await getConnectionState();
-  render(currentState);
+  let [preferences, connectionState] = await Promise.all([
+    getPreferences(),
+    getConnectionState(),
+  ]);
+  render(preferences, connectionState);
 
-  addStateChangeListener(render);
+  addStateChangeListener((newConnectionState) => {
+    connectionState = newConnectionState;
+    render(preferences, connectionState);
+  });
+
+  addPreferencesChangeListener((newPreferences) => {
+    preferences = newPreferences;
+    render(preferences, connectionState);
+  });
 });
