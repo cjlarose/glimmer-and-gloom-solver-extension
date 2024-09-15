@@ -1,6 +1,9 @@
 import { Preferences } from "../lib/preferences";
 
-export default function PreferencesForm(preferences: Preferences): Node {
+export default function PreferencesForm(
+  preferences: Preferences,
+  onPreferencesChanged: (preferences: Preferences) => void,
+): Node {
   const fragment = document.createDocumentFragment();
   const form = document.createElement("form");
   form.classList.add("preferences-form");
@@ -32,6 +35,29 @@ export default function PreferencesForm(preferences: Preferences): Node {
   } else {
     select.value = "light";
   }
+
+  select.addEventListener("change", () => {
+    switch (select.value) {
+      case "any":
+        onPreferencesChanged({
+          allowDarkToWin: true,
+          allowLightToWin: true,
+        });
+        break;
+      case "dark":
+        onPreferencesChanged({
+          allowDarkToWin: true,
+          allowLightToWin: false,
+        });
+        break;
+      case "light":
+        onPreferencesChanged({
+          allowDarkToWin: false,
+          allowLightToWin: true,
+        });
+        break;
+    }
+  });
 
   return fragment;
 }
