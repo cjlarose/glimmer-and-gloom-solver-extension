@@ -45,15 +45,6 @@ export function generateCoefficientMatrix(
   return matrix;
 }
 
-export function generateDesiredLabelingVector(
-  validCoords: Coord[],
-  desiredState: TileState,
-): number[] {
-  return new Array(validCoords.length).fill(
-    desiredState === TileState.LIGHT ? 1 : 0,
-  );
-}
-
 export function generateIndicatorVector(
   validCoords: Coord[],
   labeling: (coord: Coord) => number,

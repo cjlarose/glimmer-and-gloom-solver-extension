@@ -2,7 +2,6 @@ import { Level, Tile, TileState } from "./level";
 import {
   generateAugmentedMatrix,
   solveMod2Matrix,
-  generateDesiredLabelingVector,
   generateIndicatorVector,
   addVectors,
   generateCoefficientMatrix,
@@ -113,9 +112,9 @@ function handleLevelDataReceived(
   );
 
   const desiredState = preferences.winner;
-  const desiredLabelingVector = generateDesiredLabelingVector(
+  const desiredLabelingVector = generateIndicatorVector(
     validCoords,
-    desiredState,
+    () => desiredState,
   );
   const parityVector = addVectors(desiredLabelingVector, initialLabelingVector);
   const augmentedMatrix = generateAugmentedMatrix(
