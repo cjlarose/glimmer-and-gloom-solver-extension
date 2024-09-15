@@ -6,21 +6,9 @@ import {
 import { TileState } from "./lib/level";
 import symmetricDifference from "./lib/symmetric-difference";
 
-function render(state: ConnectionState) {
-  const root = document.querySelector<HTMLElement>("#content-root");
-  if (!root) {
-    return;
-  }
-
-  while (root.firstChild) {
-    root.removeChild(root.firstChild);
-  }
-
+function renderGame(state: ConnectionState): Node {
   if (state.type !== "COMPUTED_SOLUTION") {
-    root.appendChild(
-      document.createTextNode("To start, begin a game of Glimmer & Gloom"),
-    );
-    return;
+    return document.createTextNode("To start, begin a game of Glimmer & Gloom");
   }
 
   const {
@@ -91,6 +79,20 @@ function render(state: ConnectionState) {
     }
   }
 
+  return levelElement;
+}
+
+function render(preferences: Preferences, state: ConnectionState) {
+  const root = document.querySelector<HTMLElement>("#content-root");
+  if (!root) {
+    return;
+  }
+
+  while (root.firstChild) {
+    root.removeChild(root.firstChild);
+  }
+
+  const levelElement = renderGame(state);
   root.appendChild(levelElement);
 }
 
