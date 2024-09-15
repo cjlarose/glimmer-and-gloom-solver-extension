@@ -75,14 +75,13 @@ export function handlePacket(
       if (
         socketIOPacketType == SocketIOPacketType.EVENT &&
         Array.isArray(payload) &&
-        (payload[0] === GG_EVENT_GENERATE_LEVEL || payload[0] === GG_EVENT_RESTART_LEVEL) &&
+        (payload[0] === GG_EVENT_GENERATE_LEVEL ||
+          payload[0] === GG_EVENT_RESTART_LEVEL) &&
         ackId !== undefined
       ) {
-        const difficulty = payload[1];
         return {
           type: "WAITING_FOR_LEVEL_DATA",
           ackId,
-          difficulty,
         };
       }
       return state;
@@ -156,7 +155,6 @@ export function handlePacket(
 
         return {
           type: "COMPUTED_SOLUTION",
-          difficulty: state.difficulty,
           rows: level.rows,
           columns: level.columns,
           validCoords,
@@ -177,14 +175,13 @@ export function handlePacket(
       if (
         socketIOPacketType == SocketIOPacketType.EVENT &&
         Array.isArray(payload) &&
-        (payload[0] === GG_EVENT_GENERATE_LEVEL || payload[0] === GG_EVENT_RESTART_LEVEL) &&
+        (payload[0] === GG_EVENT_GENERATE_LEVEL ||
+          payload[0] === GG_EVENT_RESTART_LEVEL) &&
         ackId !== undefined
       ) {
-        const difficulty = payload[1];
         return {
           type: "WAITING_FOR_LEVEL_DATA",
           ackId,
-          difficulty,
         };
       } else if (
         socketIOPacketType == SocketIOPacketType.EVENT &&
