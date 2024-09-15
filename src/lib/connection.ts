@@ -4,7 +4,7 @@ import {
   solveMod2Matrix,
   generateIndicatorVector,
   addVectors,
-  generateCoefficientMatrix,
+  generateLinearTransformationForClick,
   multiplyMatrixByVector,
 } from "./solve";
 import { EngineIOPacketType } from "./engine_io";
@@ -105,7 +105,7 @@ function handleLevelDataReceived(
 
   const { validCoords, initialLabelingVector } = level;
 
-  const coefficientMatrix = generateCoefficientMatrix(
+  const coefficientMatrix = generateLinearTransformationForClick(
     level.rows,
     level.columns,
     validCoords,

@@ -1,6 +1,6 @@
 import { Coord, getAllNeighbors } from "./coords";
 
-export function generateCoefficientMatrix(
+export function generateLinearTransformationForClick(
   rows: number,
   columns: number,
   validCoords: Coord[],
