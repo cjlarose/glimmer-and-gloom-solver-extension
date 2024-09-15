@@ -6,6 +6,42 @@ import {
 import { TileState } from "./lib/level";
 import symmetricDifference from "./lib/symmetric-difference";
 
+function renderHexagon(props: {
+  row: number;
+  column: number;
+  tileState?: TileState;
+  muted: boolean;
+}): Node {
+  const { row, column, tileState, muted } = props;
+  const hexagon = document.createElement("div");
+  hexagon.classList.add("hex");
+  if (row % 2 === 0) {
+    hexagon.classList.add("even-row");
+  }
+
+  hexagon.dataset.row = row.toString();
+  hexagon.dataset.column = column.toString();
+
+  const hexIn = document.createElement("div");
+  hexIn.classList.add("hex-in");
+
+  const hexLink = document.createElement("a");
+  hexLink.classList.add("hex-link");
+
+  switch (tileState) {
+    case TileState.DARK:
+      hexLink.classList.add(`tile-status-dark${muted ? "-muted" : ""}`);
+      break;
+    case TileState.LIGHT:
+      hexLink.classList.add(`tile-status-light${muted ? "-muted" : ""}`);
+      break;
+  }
+
+  hexIn.appendChild(hexLink);
+  hexagon.appendChild(hexIn);
+  return hexagon;
+}
+
 function renderGame(state: ConnectionState): Node {
   if (state.type !== "COMPUTED_SOLUTION") {
     return document.createTextNode("To start, begin a game of Glimmer & Gloom");
@@ -31,13 +67,10 @@ function renderGame(state: ConnectionState): Node {
   );
   const remainingToClick = symmetricDifference(solutionSet, clickedSet);
 
-  const tileStatusMap = new Map<String, TileState>();
+  const tileStateMap = new Map<String, TileState>();
   for (const tile of validCoords) {
     const key = `${tile.row},${tile.column}`;
-    tileStatusMap.set(
-      key,
-      lightSet.has(key) ? TileState.LIGHT : TileState.DARK,
-    );
+    tileStateMap.set(key, lightSet.has(key) ? TileState.LIGHT : TileState.DARK);
   }
 
   const levelElement = document.createElement("div");
@@ -46,35 +79,12 @@ function renderGame(state: ConnectionState): Node {
 
   for (let row = 1; row <= rows; row++) {
     for (let column = 1; column <= columns; column++) {
-      const hexagon = document.createElement("div");
-      hexagon.classList.add("hex");
-      if (row % 2 === 0) {
-        hexagon.classList.add("even-row");
-      }
-
-      hexagon.dataset.row = row.toString();
-      hexagon.dataset.column = column.toString();
-
-      const hexIn = document.createElement("div");
-      hexIn.classList.add("hex-in");
-
-      const hexLink = document.createElement("a");
-      hexLink.classList.add("hex-link");
-
-      const tileStatus = tileStatusMap.get(`${row},${column}`);
-      const muted = !remainingToClick.has(`${row},${column}`);
-      switch (tileStatus) {
-        case TileState.DARK:
-          hexLink.classList.add(`tile-status-dark${muted ? "-muted" : ""}`);
-          break;
-        case TileState.LIGHT:
-          hexLink.classList.add(`tile-status-light${muted ? "-muted" : ""}`);
-          break;
-      }
-
-      hexIn.appendChild(hexLink);
-      hexagon.appendChild(hexIn);
-
+      const hexagon = renderHexagon({
+        row,
+        column,
+        tileState: tileStateMap.get(`${row},${column}`),
+        muted: !remainingToClick.has(`${row},${column}`),
+      });
       levelElement.appendChild(hexagon);
     }
   }
