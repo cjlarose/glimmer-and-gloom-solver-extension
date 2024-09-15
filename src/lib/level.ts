@@ -1,3 +1,5 @@
+import { Coord } from "./coords";
+
 export enum TileState {
   DARK,
   LIGHT,
@@ -12,5 +14,6 @@ export interface Tile {
 export interface Level {
   rows: number;
   columns: number;
-  tiles: Tile[];
+  validCoords: Coord[];
+  initialLabelingVector: number[];
 }

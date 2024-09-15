@@ -1,4 +1,4 @@
-import { Level, TileState } from "./level";
+import { TileState } from "./level";
 import { Coord, getAllNeighbors } from "./coords";
 
 export function generateCoefficientMatrix(
@@ -185,27 +185,4 @@ export function solveMod2Matrix(augmentedMatrix: number[][]): number[][] {
   generateCombinations(new Array(numCols).fill(0), 0);
 
   return solutions;
-}
-
-export function getSolutionCoordinates(
-  level: Level,
-  solutions: number[][],
-): Coord[][] {
-  // Create a mapping of indices to coordinates
-  const coordToIndex: Map<number, Coord> = new Map();
-  let index = 0;
-  for (const tile of level.tiles) {
-    coordToIndex.set(index++, { row: tile.row, column: tile.column });
-  }
-
-  // Map each solution vector to coordinates
-  return solutions.map((solutionVector) => {
-    return solutionVector
-      .map((value, idx) => {
-        if (value === 1) {
-          return coordToIndex.get(idx);
-        }
-      })
-      .filter((coord) => coord !== undefined) as Coord[];
-  });
 }

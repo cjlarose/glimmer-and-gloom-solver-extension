@@ -14,10 +14,10 @@ export interface ComputedSolution {
   rows: number;
   columns: number;
   validCoords: Coord[];
-  initialLightCoords: Coord[];
-  lightCoords: Coord[];
-  minimalSolution: Coord[];
-  clickedCoords: Coord[];
+  coefficientMatrix: number[][];
+  initialLabelingVector: number[];
+  changedCoordsVector: number[];
+  minimalSolution: number[];
 }
 
 export type ConnectionState =

@@ -1,6 +1,6 @@
 import { ComputedSolution } from "../lib/connection_state";
 import { TileState } from "../lib/level";
-import symmetricDifference from "../lib/symmetric-difference";
+import { addVectors, multiplyMatrixByVector } from "../lib/solve";
 import Tile from "./Tile";
 
 export default function Level(state: ComputedSolution): Node {
@@ -8,26 +8,30 @@ export default function Level(state: ComputedSolution): Node {
     rows,
     columns,
     validCoords,
-    lightCoords,
+    coefficientMatrix,
+    initialLabelingVector,
+    changedCoordsVector,
     minimalSolution,
-    clickedCoords,
   } = state;
 
-  const lightSet = new Set(
-    lightCoords.map(({ row, column }) => `${row},${column}`),
+  const flippedCoordsVector = multiplyMatrixByVector(
+    coefficientMatrix,
+    changedCoordsVector,
   );
-  const solutionSet = new Set(
-    minimalSolution.map(({ row, column }) => `${row},${column}`),
+  const tileStateVector = addVectors(
+    initialLabelingVector,
+    flippedCoordsVector,
   );
-  const clickedSet = new Set(
-    clickedCoords.map(({ row, column }) => `${row},${column}`),
+  const remainingToClickVector = addVectors(
+    minimalSolution,
+    changedCoordsVector,
   );
-  const remainingToClick = symmetricDifference(solutionSet, clickedSet);
 
-  const tileStateMap = new Map<String, TileState>();
+  // Create a mapping of coordinates to indices in the vectors
+  const coordToIndex: Map<string, number> = new Map();
+  let index = 0;
   for (const tile of validCoords) {
-    const key = `${tile.row},${tile.column}`;
-    tileStateMap.set(key, lightSet.has(key) ? TileState.LIGHT : TileState.DARK);
+    coordToIndex.set(`${tile.row},${tile.column}`, index++);
   }
 
   const levelElement = document.createElement("div");
@@ -36,11 +40,15 @@ export default function Level(state: ComputedSolution): Node {
 
   for (let row = 1; row <= rows; row++) {
     for (let column = 1; column <= columns; column++) {
+      const index = coordToIndex.get(`${row},${column}`);
+      const tileState: TileState | undefined =
+        index !== undefined ? tileStateVector[index] : undefined;
+      const muted = index !== undefined && remainingToClickVector[index] === 0;
       const hexagon = Tile({
         row,
         column,
-        tileState: tileStateMap.get(`${row},${column}`),
-        muted: !remainingToClick.has(`${row},${column}`),
+        tileState,
+        muted,
       });
       levelElement.appendChild(hexagon);
     }

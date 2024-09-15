@@ -2,7 +2,6 @@ import { Level, Tile, TileState } from "./level";
 import {
   generateAugmentedMatrix,
   solveMod2Matrix,
-  getSolutionCoordinates,
   generateDesiredLabelingVector,
   generateIndicatorVector,
   addVectors,
@@ -20,6 +19,7 @@ import {
 import { Preferences } from "./preferences";
 import { Message } from "./frames";
 import { Event } from "./event";
+import { Coord } from "./coords";
 
 const GG_EVENT_GENERATE_LEVEL = "generateLevel";
 const GG_EVENT_RESTART_LEVEL = "restartLevel";
@@ -76,16 +76,17 @@ function isRecordMoveEvent(message: Message): boolean {
 }
 
 function parseLevel(levelData: LevelData): Level {
-  const tiles: Tile[] = levelData.tiles.map((tile: TileData) => ({
-    row: tile.row,
-    column: tile.column,
-    status: tile.status === 1 ? TileState.LIGHT : TileState.DARK,
+  const validCoords = levelData.tiles.map(({ row, column }) => ({
+    row,
+    column,
   }));
+  const initialLabelingVector = levelData.tiles.map(({ status }) => status);
 
   return {
     rows: levelData.rows,
     columns: levelData.columns,
-    tiles,
+    validCoords,
+    initialLabelingVector,
   };
 }
 
@@ -93,14 +94,6 @@ function handleLevelDataReceived(
   preferences: Preferences,
   level: Level,
 ): ConnectionState {
-  const validCoords = level.tiles.map(({ row, column }) => ({
-    row,
-    column,
-  }));
-  const lightCoords = level.tiles
-    .filter(({ status }) => status === TileState.LIGHT)
-    .map(({ row, column }) => ({ row, column }));
-
   // Solve the equation Ax = d + f0, where
   //   A is the coefficient matrix,
   //   d is the desired labeling vector,
@@ -111,10 +104,8 @@ function handleLevelDataReceived(
   // and solve the matrix mod 2, giving us all possible indicator
   // vectors for which tiles need to be clicked.
 
-  const initialLabelingVector = generateIndicatorVector(
-    validCoords,
-    lightCoords,
-  );
+  const { validCoords, initialLabelingVector } = level;
+
   const coefficientMatrix = generateCoefficientMatrix(
     level.rows,
     level.columns,
@@ -132,84 +123,42 @@ function handleLevelDataReceived(
     parityVector,
   );
   const solutions = solveMod2Matrix(augmentedMatrix);
-  const solutionCoords = getSolutionCoordinates(level, solutions);
 
-  const minimalSolution = solutionCoords.reduce(
-    (minSolution, currentSolution) => {
-      return currentSolution.length < minSolution.length
-        ? currentSolution
-        : minSolution;
-    },
-    solutionCoords[0],
-  );
+  const minimalSolution = solutions
+    .map((solution) => ({
+      solution,
+      numVertices: solution.reduce((acc, value) => acc + value, 0),
+    }))
+    .reduce((acc, value) =>
+      value.numVertices < acc.numVertices ? value : acc,
+    ).solution;
+
+  const changedCoordsVector = generateIndicatorVector(validCoords, []);
 
   return {
     type: "COMPUTED_SOLUTION",
     rows: level.rows,
     columns: level.columns,
     validCoords,
-    initialLightCoords: lightCoords,
-    lightCoords,
+    coefficientMatrix,
+    initialLabelingVector,
+    changedCoordsVector,
     minimalSolution,
-    clickedCoords: [],
   };
 }
 
 function handleMoveRecorded(
   state: ComputedSolution,
-  payload: any,
+  coord: Coord,
 ): ConnectionState {
-  const [row, column] = payload[1];
-  const newClickedCoords = state.clickedCoords.find(
-    (coord) => coord.row == row && coord.column == column,
-  )
-    ? state.clickedCoords.filter(
-        (coord) => coord.row !== row || coord.column !== column,
-      )
-    : [...state.clickedCoords, { row, column }];
-
-  // Multiplying the coefficient matrix by the vector representing where
-  // the user has clicked gives us a vector where a 0 indicates that the
-  // tile is in the same state as the initial labeling, and a 1 indicates
-  // that the tile has flipped
-
-  const { rows, columns, validCoords, initialLightCoords } = state;
-  const coefficientMatrix = generateCoefficientMatrix(
-    rows,
-    columns,
-    validCoords,
+  const newChangedCoordsVector = addVectors(
+    state.changedCoordsVector,
+    generateIndicatorVector(state.validCoords, [coord]),
   );
-  const initialLabelingVector = generateIndicatorVector(
-    validCoords,
-    initialLightCoords,
-  );
-  const clickedCoordsVector = generateIndicatorVector(
-    validCoords,
-    newClickedCoords,
-  );
-  const flippedCoordsVector = multiplyMatrixByVector(
-    coefficientMatrix,
-    clickedCoordsVector,
-  );
-  const lightCoordsVector = addVectors(
-    flippedCoordsVector,
-    initialLabelingVector,
-  );
-
-  const coordToIndex: Map<string, number> = new Map();
-  let index = 0;
-  for (const tile of validCoords) {
-    coordToIndex.set(`${tile.row},${tile.column}`, index++);
-  }
-  const newLightCoords = validCoords.filter((coord) => {
-    const index = coordToIndex.get(`${coord.row},${coord.column}`);
-    return index !== undefined && lightCoordsVector[index] === 1;
-  });
 
   return {
     ...state,
-    lightCoords: newLightCoords,
-    clickedCoords: newClickedCoords,
+    changedCoordsVector: newChangedCoordsVector,
   };
 }
 
@@ -217,38 +166,30 @@ function handlePreferencesChanged(
   state: ComputedSolution,
   preferences: Preferences,
 ): ConnectionState {
-  const { rows, columns, validCoords, initialLightCoords, clickedCoords } =
-    state;
-  const coefficientMatrix = generateCoefficientMatrix(
+  const {
     rows,
     columns,
     validCoords,
-  );
-  const initialLabelingVector = generateIndicatorVector(
-    validCoords,
-    initialLightCoords,
-  );
-  const clickedCoordsVector = generateIndicatorVector(
-    validCoords,
-    clickedCoords,
-  );
+    coefficientMatrix,
+    initialLabelingVector,
+    changedCoordsVector,
+  } = state;
+
   const flippedCoordsVector = multiplyMatrixByVector(
     coefficientMatrix,
-    clickedCoordsVector,
+    changedCoordsVector,
   );
-  const lightCoordsVector = addVectors(
-    flippedCoordsVector,
+  const tileStateVector = addVectors(
     initialLabelingVector,
+    flippedCoordsVector,
   );
-  const tiles = validCoords.map((coord) => {
-    const index = validCoords.findIndex(
-      (c) => c.row === coord.row && c.column === coord.column,
-    );
-    const status =
-      lightCoordsVector[index] === 1 ? TileState.LIGHT : TileState.DARK;
-    return { row: coord.row, column: coord.column, status };
-  });
-  const level = { rows, columns, tiles };
+  const level: Level = {
+    rows,
+    columns,
+    validCoords,
+    initialLabelingVector: tileStateVector,
+  };
+
   return handleLevelDataReceived(preferences, level);
 }
 
@@ -317,7 +258,9 @@ export function handlePacket(
         return initialState;
       }
       if (isRecordMoveEvent(message)) {
-        return handleMoveRecorded(state, payload);
+        const [row, column] = payload[1];
+        const coord: Coord = { row, column };
+        return handleMoveRecorded(state, coord);
       }
       return state;
     default:
