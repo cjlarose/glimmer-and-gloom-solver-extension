@@ -14,7 +14,7 @@
 
 \section{Introduction}
 
-Glimmer and Gloom is a game played on a finite undirected simple graph \( G = (V, E) \), where each vertex \( v \in V \) is labeled by a function \( f_0: V \to \mathbb{Z}_2 \), with \( 0 \) representing a ``dark'' vertex and \( 1 \) representing a ``light'' vertex. A player can perform a click operation on any vertex \( v \), which toggles the label of \( v \) as well as the labels of all adjacent vertices. The goal is to find a sequence of click operations that produces a labeling \( d \) such that either all vertices receive a dark label (\(\forall v \in V, d(v) = 0 \)) or all vertices receive a light label (\( \forall v \in V, d(v) = 1 \)).
+Glimmer and Gloom is a game played on a finite undirected simple graph \( G = (V, E) \), where each vertex \( v \in V \) is labeled by a function \( f_0: V \to \mathbb{Z}_2 \), with \( 0 \) representing a ``dark'' vertex and \( 1 \) representing a ``light'' vertex. A player can perform a sequence of click operations, where clicking on any vertex \( v \),  toggles the label of \( v \) as well as the labels of all adjacent vertices. The goal is to find a sequence of click operations that produces a labeling \( d \) such that either all vertices receive a dark label (\(\forall v \in V, d(v) = 0 \)) or all vertices receive a light label (\( \forall v \in V, d(v) = 1 \)).
 
 \section{Reduction to Linear System}
 
@@ -44,8 +44,25 @@ The matrix \( A \) represents the adjacency structure of the graph \( G \), and 
 
 Since each click is an involution (clicking a vertex twice has no effect), the system is guaranteed to have a solution whenever \( f_0 + d \) is in the image of \( A \).
 
+\section{Algorithm for Finding a Minimal Solution}
+
+Given the system  \( A x = f_0 + d \), we seek a minimal solution, which corresponds to the smallest set  \( S \subseteq V \) such that clicking all vertices in \( S \) yields the desired final labeling \( d \) . Minimizing the size of \( S \) is equivalent to minimizing the number of non-zero entries in the solution vector \( x \). This problem can be framed as finding the solution to the system \( A x = f_0 + d \)  with the minimum Hamming weight of \( x \).
+
+Consider the following algorithm to find a minimal solution:
+
+\begin{enumerate}
+\item Compute the rank of the matrix \( A \)  and determine if \( f_0 + d \in \operatorname{im}(A) \). If \( f_0 + d \notin \operatorname{im}(A) \), no solution exists.
+\item Solve the system \( A x = f_0 + d \)  using Gaussian elimination over \(  \mathbb{Z}_2 \) to obtain a solution vector \( x \). If multiple solutions exist, express the solution space as \( x = x_0 + \sum_{i=1}^{k} \alpha_i v_i \), where \( x_0 \) is a particular solution, \( v_1, \dots, v_k \) are a basis for the null space of \( A \), and \( \alpha_i \in \mathbb{Z}_2 \).
+\item Among all possible solutions \( x = x_0 + \sum_{i=1}^{k} \alpha_i v_i \), select the one with the minimal Hamming weight by testing all  \( 2^k \)  combinations of \( \alpha_1, \dots, \alpha_k \in \{0, 1\} \). This can be done efficiently by iterating through all possible vectors \( \alpha = (\alpha_1, \dots, \alpha_k) \in \mathbb{Z}_2^k \).
+\item Output the solution \( x \)  with the smallest number of non-zero entries.
+\end{enumerate}
+
 \section{Conclusion}
 
-We have shown that solving the game of Glimmer and Gloom is equivalent to solving the system of linear equations \( A x = f_0 + d \) over \( \mathbb{Z}_2 \), where \( A \) is the matrix encoding the adjacency structure of the graph, \( f_0 \) is the initial vertex labeling, and \( d \) is the desired final labeling. The existence of a solution depends on the rank of \( A \) and whether \( f_0 + d \) lies in the image of \( A \). If \( A \) has full rank, the system has a unique solution for any \( f_0 \) and \( d \).
+We have demonstrated that the game of Glimmer and Gloom can be reduced to solving a system of linear modular congruences over \( \mathbb{Z}_2 \). The adjacency matrix of the graph plus the identity matrix determines the structure of this system, where each solution corresponds to a set of vertex clicks that toggles the labels of the vertices to produce the desired labeling.
+
+The existence of a solution depends on whether the target labeling, \( f0+d \), lies in the image of the matrix \( A \). When a solution exists, finding a minimal set of clicks, equivalent to minimizing the Hamming weight of the solution vector, can be efficiently computed by exploring the null space of \( A \) and selecting the solution with the fewest non-zero entries.
+
+This approach provides a clear framework for solving the game, making it possible to determine not only whether a solution exists but also how to achieve it with the minimal number of moves.
 
 \end{document}
