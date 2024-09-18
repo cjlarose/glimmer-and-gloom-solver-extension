@@ -5,7 +5,7 @@
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{corollary}[theorem]{Corollary}
 
-\title{Reduction of Glimmer and Gloom to Solving a System of Linear Modular Congruences in \(\mathbb{Z}_2\)}
+\title{Reduction of Glimmer and Gloom to Solving a System of Linear Modular Congruences over \(\mathbb{Z}_2\)}
 \author{Chris La Rose}
 
 \begin{document}
@@ -14,29 +14,31 @@
 
 \section{Introduction}
 
-Glimmer and Gloom is a game played on a finite undirected simple graph \( G = (V, E) \), where each vertex \( v \in V \) is assigned a label \( f_0(v) \in \mathbb{Z}_2 \), with \( 0 \) representing a "dark" vertex and \( 1 \) representing a "light" vertex. A move consists of "clicking" a vertex \( v \), which toggles the state of \( v \) and all its neighbors. The goal is to find a sequence of vertex clicks that results in either all vertices being dark (\( 0 \)) or all vertices being light (\( 1 \)).
+Glimmer and Gloom is a game played on a finite undirected simple graph \( G = (V, E) \), where each vertex \( v \in V \) is labeled by a function \( f_0: V \to \mathbb{Z}_2 \), with \( 0 \) representing a ``dark'' vertex and \( 1 \) representing a ``light'' vertex. A player can perform a click operation on any vertex \( v \), which toggles the label of \( v \) as well as the labels of all adjacent vertices. The goal is to find a sequence of click operations that produces a labeling \( d \) such that either all vertices receive a dark label (\(\forall v \in V, d(v) = 0 \)) or all vertices receive a light label (\( \forall v \in V, d(v) = 1 \)).
 
 \section{Reduction to Linear System}
 
-For each vertex \( v \in V \), define the vector \( c_v \in \mathbb{Z}_2^{|V|} \), where:
-\[
-    c_v(u) = 
-    \begin{cases} 
-        1 & \text{if } u = v \text{ or } (u, v) \in E, \\
-        0 & \text{otherwise}.
-    \end{cases}
-\]
-The vector \( c_v \) describes the effect of clicking vertex \( v \) on the graph: it toggles the state of \( v \) and all its neighbors.
+Let \( A \in \mathbb{Z}_2^{|V| \times |V|} \) be the matrix such that
 
-Let \( A \in \mathbb{Z}_2^{|V| \times |V|} \) be the matrix whose columns are the vectors \( c_v \) for \( v \in V \). A sequence of clicks can be represented by a vector \( x \in \mathbb{Z}_2^{|V|} \), where \( x_i = 1 \) if vertex \( v_i \) is clicked and \( x_i = 0 \) otherwise. Applying this sequence of clicks to the initial labeling \( f_0 \in \mathbb{Z}_2^{|V|} \) results in a new labeling given by:
 \[
-    A x = f_0 + d \mod 2,
+  A_{i,j} =
+  \begin{cases}
+        1 & \text{if } i = j \text{ or } (v_i, v_j) \in E, \\
+        0 & \text{otherwise}
+  \end{cases}
 \]
-where \( d \in \mathbb{Z}_2^{|V|} \) is the desired final labeling, either the all-dark vector (\( d = 0 \)) or the all-light vector (\( d = 1 \)).
+
+That is, \( A \) is the adjacency matrix of the graph \( G \) plus the identity matrix \( I_{|V|} \). The column vectors of this matrix represent the effect on the labels of the vertices when the corresponding vertex is clicked.
+
+Let  \( x \in \mathbb{Z}_2^{|V|} \) be an indicator vector for a set of vertices \( S \subseteq V \), where \( x_i = 1 \) if \( v_i \in S \) and \( x_i = 0 \) otherwise. Clicking on each of the vertices in \( S \) on the graph with initial labeling \( f_0 \in \mathbb{Z}_2^{|V|} \) results in a new labeling given by:
+\[
+    A x = f_0 + d,
+\]
+where \( d \in \mathbb{Z}_2^{|V|} \) is the desired final labeling, either the all-dark vector (\( d = \vec{0} \)) or the all-light vector (\( d = \vec{1} \)).
 
 \section{Existence of Solutions}
 
-The equation \( A x = f_0 + d \mod 2 \) is a system of linear equations over \( \mathbb{Z}_2 \). To determine whether a solution exists, we observe that \( A x = f_0 + d \) is consistent if and only if \( f_0 + d \) belongs to the image (column space) of \( A \). 
+The equation \( A x = f_0 + d \) is a system of linear equations over \( \mathbb{Z}_2 \). To determine whether a solution exists, we observe that \( A x = f_0 + d \) is consistent if and only if \( f_0 + d \) belongs to the image (column space) of \( A \). 
 
 The matrix \( A \) represents the adjacency structure of the graph \( G \), and its rank determines the number of independent equations in the system. If \( A \) has full rank (i.e., \( \operatorname{rank}(A) = |V| \)), then for each \( f_0 + d \), there exists a unique solution \( x \). If \( A \) does not have full rank, there may be multiple solutions or none, depending on whether \( f_0 + d \) lies in the image of \( A \).
 
@@ -44,6 +46,6 @@ Since each click is an involution (clicking a vertex twice has no effect), the s
 
 \section{Conclusion}
 
-We have shown that solving the game of Glimmer and Gloom is equivalent to solving the system of linear equations \( A x = f_0 + d \mod 2 \), where \( A \) is the matrix encoding the adjacency structure of the graph, \( f_0 \) is the initial vertex labeling, and \( d \) is the desired final labeling. The existence of a solution depends on the rank of \( A \) and whether \( f_0 + d \) lies in the image of \( A \). If \( A \) has full rank, the system has a unique solution for any \( f_0 \) and \( d \).
+We have shown that solving the game of Glimmer and Gloom is equivalent to solving the system of linear equations \( A x = f_0 + d \) over \( \mathbb{Z}_2 \), where \( A \) is the matrix encoding the adjacency structure of the graph, \( f_0 \) is the initial vertex labeling, and \( d \) is the desired final labeling. The existence of a solution depends on the rank of \( A \) and whether \( f_0 + d \) lies in the image of \( A \). If \( A \) has full rank, the system has a unique solution for any \( f_0 \) and \( d \).
 
 \end{document}
