@@ -61,7 +61,7 @@ Consider the following algorithm to find a minimal solution:
 
 We have demonstrated that the game of Glimmer and Gloom can be reduced to solving a system of linear modular congruences over \( \mathbb{Z}_2 \). The adjacency matrix of the graph plus the identity matrix determines the structure of this system, where each solution corresponds to a set of vertex clicks that toggles the labels of the vertices to produce the desired labeling.
 
-The existence of a solution depends on whether the target labeling, \( f0+d \), lies in the image of the matrix \( A \). When a solution exists, finding a minimal set of clicks, equivalent to minimizing the Hamming weight of the solution vector, can be efficiently computed by exploring the null space of \( A \) and selecting the solution with the fewest non-zero entries.
+The existence of a solution depends on whether the target labeling, \( f_0 + d \), lies in the image of the matrix \( A \). When a solution exists, finding a minimal set of clicks, equivalent to minimizing the Hamming weight of the solution vector, can be efficiently computed by exploring the null space of \( A \) and selecting the solution with the fewest non-zero entries.
 
 This approach provides a clear framework for solving the game, making it possible to determine not only whether a solution exists but also how to achieve it with the minimal number of moves.
 
