@@ -7,7 +7,7 @@
     "build": "pnpm clean && pnpm icons && webpack --config webpack/webpack.config.js",
     "clean": "rm -rf dist && rm -f *.zip",
     "icons": "script/export-icons",
-    "pages": "cd proof && rm -rf main && latex2html -image_type png -split 0 main.tex",
+    "pages": "cd proof && rm -rf main && latex2html -image_type png -split 0 main.tex && gh-pages -d main",
     "watch": "pnpm clean && webpack --config webpack/webpack.config.js --watch",
     "zip": "pnpm build && zip -r $npm_package_name-$(jq -r '.version' public/manifest.json).zip dist/"
   },
