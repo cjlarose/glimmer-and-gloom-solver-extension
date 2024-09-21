@@ -22,8 +22,9 @@ export interface ComputedSolution {
   validCoords: Coord[];
   linearTransformation: number[][];
   initialLabelingVector: number[];
+  solutions: number[][];
+  selectedSolutionIndex: number;
   changedCoordsVector: number[];
-  minimalSolution: number[];
 }
 
 export type WorkerState = WorkerInit | ComputedSolution;
@@ -64,14 +65,14 @@ function handleLevelDataReceived(
   );
   const solutions = solveMod2Matrix(augmentedMatrix);
 
-  const minimalSolution = solutions
-    .map((solution) => ({
-      solution,
+  const minimalSolutionIndex = solutions
+    .map((solution, index) => ({
+      index,
       numVertices: solution.reduce((acc, value) => acc + value, 0),
     }))
     .reduce((acc, value) =>
       value.numVertices < acc.numVertices ? value : acc,
-    ).solution;
+    ).index;
 
   const changedCoordsVector = generateIndicatorVector(validCoords, () => 0);
 
@@ -82,8 +83,9 @@ function handleLevelDataReceived(
     validCoords,
     linearTransformation,
     initialLabelingVector,
+    solutions,
+    selectedSolutionIndex: minimalSolutionIndex,
     changedCoordsVector,
-    minimalSolution,
   };
 }
 

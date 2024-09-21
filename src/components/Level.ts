@@ -10,10 +10,12 @@ export default function Level(state: ComputedSolution): Node {
     validCoords,
     linearTransformation,
     initialLabelingVector,
+    solutions,
+    selectedSolutionIndex,
     changedCoordsVector,
-    minimalSolution,
   } = state;
 
+  const selectedSolution = solutions[selectedSolutionIndex];
   const flippedCoordsVector = applyLinearTransformation(
     linearTransformation,
     changedCoordsVector,
@@ -23,7 +25,7 @@ export default function Level(state: ComputedSolution): Node {
     flippedCoordsVector,
   );
   const remainingToClickVector = addVectors(
-    minimalSolution,
+    selectedSolution,
     changedCoordsVector,
   );
 
