@@ -154,3 +154,7 @@ export function solveMod2Matrix(augmentedMatrix: number[][]): number[][] {
 
   return solutions;
 }
+
+export function hammingWeight(vector: number[]) {
+  return vector.reduce((acc, value) => (value !== 0 ? acc + 1 : acc), 0);
+}

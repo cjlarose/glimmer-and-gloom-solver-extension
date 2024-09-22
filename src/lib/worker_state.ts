@@ -6,6 +6,7 @@ import {
   addVectors,
   generateLinearTransformationForClick,
   applyLinearTransformation,
+  hammingWeight,
 } from "./solve";
 import { Preferences } from "./preferences";
 import { Event } from "./event";
@@ -68,10 +69,10 @@ function handleLevelDataReceived(
   const minimalSolutionIndex = solutions
     .map((solution, index) => ({
       index,
-      numVertices: solution.reduce((acc, value) => acc + value, 0),
+      hammingWeight: hammingWeight(solution),
     }))
     .reduce((acc, value) =>
-      value.numVertices < acc.numVertices ? value : acc,
+      value.hammingWeight < acc.hammingWeight ? value : acc,
     ).index;
 
   const changedCoordsVector = generateIndicatorVector(validCoords, () => 0);
