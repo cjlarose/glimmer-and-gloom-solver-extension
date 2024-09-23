@@ -1,7 +1,7 @@
 {
   "name": "Glimmer & Gloom Solver",
   "description": "Suggests optimal solutions to Glimmer & Gloom on Flight Rising",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "manifest_version": 3,
   "icons": {
     "16": "images/icon16.png",
