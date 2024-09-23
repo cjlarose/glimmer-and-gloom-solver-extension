@@ -124,14 +124,29 @@
 /*** Help text ***********************************************************************************************/
 .how-to {
   background: hsl(45deg 100% 90%);
-  padding: 0.6rem;
+  padding: 0.6rem 4rem 0.6rem 0.6rem;
   margin-bottom: 1em;
   color: hsl(45deg 95% 25%);
   border-radius: 7px;
+  position: relative;
 }
 
 .how-to p {
   margin: 0;
+}
+
+.close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.75rem 1.25rem;
+  border: 0;
+  background-color: transparent;
+  font-size: 1.5rem;
+  font-weight: 700;
+  opacity: 0.5;
+  color: inherit;
+  cursor: pointer;
 }
 
 /*** Collapsible Advanced Options ****************************************************************************/

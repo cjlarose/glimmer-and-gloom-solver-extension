@@ -18,7 +18,7 @@ export default function SidePanelRoot(
   const fragment = document.createDocumentFragment();
   fragment.appendChild(PreferencesForm(preferences, onPreferencesChanged));
   fragment.appendChild(Level(state));
-  fragment.appendChild(HowTo());
+  fragment.appendChild(HowTo(preferences, onPreferencesChanged));
   fragment.appendChild(
     AdvancedOptions(
       preferences,
