@@ -18,10 +18,10 @@ export default function PreferencesForm(
   const select = document.createElement("select");
   select.name = "allowed-winner";
 
-  const darkOption = document.createElement("option");
-  darkOption.value = "dark";
-  darkOption.text = "Dark";
-  select.appendChild(darkOption);
+  const shadowOption = document.createElement("option");
+  shadowOption.value = "shadow";
+  shadowOption.text = "Shadow";
+  select.appendChild(shadowOption);
 
   const lightOption = document.createElement("option");
   lightOption.value = "light";
@@ -31,11 +31,11 @@ export default function PreferencesForm(
   label.appendChild(select);
   form.appendChild(label);
 
-  select.value = preferences.winner === TileState.DARK ? "dark" : "light";
+  select.value = preferences.winner === TileState.DARK ? "shadow" : "light";
 
   select.addEventListener("change", () => {
     switch (select.value) {
-      case "dark":
+      case "shadow":
         onPreferencesChanged({
           ...preferences,
           winner: TileState.DARK,
