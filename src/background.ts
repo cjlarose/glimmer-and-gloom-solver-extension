@@ -1,6 +1,6 @@
 import { handleEvent } from "./lib/worker_state";
-import { Frame, parseEventFromFrame } from "./lib/frames";
-import { Event } from "./lib/event";
+import { parseEventFromFrame } from "./lib/frames";
+import { Event, SolutionIndexChanged } from "./lib/event";
 import { getWorkerState, setWorkerState } from "./lib/worker_state_storage";
 import {
   getPreferences,
@@ -31,8 +31,18 @@ async function handleMessage(event: Event): Promise<void> {
   isHandlingMessage = false;
 }
 
-chrome.runtime.onMessage.addListener((frame: Frame, _, sendResponse) => {
-  const event = parseEventFromFrame(frame);
+chrome.runtime.onMessage.addListener((message: any, _, sendResponse) => {
+  if (message.type === "SOLUTION_INDEX_CHANGED") {
+    const solutionIndex = message.solutionIndex;
+    const event: SolutionIndexChanged = {
+      type: "SOLUTION_INDEX_CHANGED",
+      solutionIndex,
+    };
+    handleMessage(event).then(() => sendResponse(true));
+    return true;
+  }
+
+  const event = parseEventFromFrame(message);
   if (event !== undefined) {
     handleMessage(event).then(() => sendResponse(true));
     return true;

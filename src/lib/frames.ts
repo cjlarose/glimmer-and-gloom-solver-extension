@@ -74,9 +74,13 @@ function parseLevel(levelData: LevelData): Level {
   };
 }
 
-export function parseEventFromFrame(frame: Frame): Event | undefined {
+export function parseEventFromFrame(frame: any): Event | undefined {
   if (frame.engineIOPacketType === EngineIOPacketType.UPGRADE) {
     return { type: "CONNECTION_INIT" };
+  }
+
+  if (frame.engineIOPacketType !== EngineIOPacketType.MESSAGE) {
+    return undefined;
   }
 
   const message: Message = frame;

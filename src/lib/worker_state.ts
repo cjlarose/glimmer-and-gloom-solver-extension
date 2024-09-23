@@ -138,6 +138,13 @@ function handlePreferencesChanged(
   return handleLevelDataReceived(preferences, level);
 }
 
+function handleSolutionIndexChanged(
+  state: ComputedSolution,
+  solutionIndex: number,
+): WorkerState {
+  return { ...state, selectedSolutionIndex: solutionIndex };
+}
+
 export function handleEvent(
   preferences: Preferences,
   state: WorkerState = initialState,
@@ -161,6 +168,8 @@ export function handleEvent(
           return handleLevelDataReceived(preferences, event.level);
         case "PREFERENCES_UPDATED":
           return handlePreferencesChanged(state, preferences);
+        case "SOLUTION_INDEX_CHANGED":
+          return handleSolutionIndexChanged(state, event.solutionIndex);
         default:
           return state;
       }

@@ -25,9 +25,15 @@ export interface PreferencesUpdatedEvent {
   preferences: Preferences;
 }
 
+export interface SolutionIndexChanged {
+  type: "SOLUTION_INDEX_CHANGED";
+  solutionIndex: number;
+}
+
 export type Event =
   | ConnectionInitEvent
   | HighScoresRequestedEvent
   | LevelDataReceivedEvent
   | PlayerMovedEvent
-  | PreferencesUpdatedEvent;
+  | PreferencesUpdatedEvent
+  | SolutionIndexChanged;
