@@ -8,21 +8,12 @@ function SolutionOption(index: number, solution: number[]): Node {
   return option;
 }
 
-export default function SolutionForm(
+function SolutionSelect(
   state: ComputedSolution,
   onSolutionIndexChanged: (solutionIndex: number) => void,
-): Node {
-  const fragment = document.createDocumentFragment();
-
-  const solutionCount = document.createElement("p");
-  solutionCount.appendChild(
-    document.createTextNode(`Found ${state.solutions.length} solutions`),
-  );
-  fragment.appendChild(solutionCount);
-
+) {
   const form = document.createElement("form");
   form.classList.add("solution-form");
-  fragment.appendChild(form);
 
   const select = document.createElement("select");
   select.name = "solution-index";
@@ -39,6 +30,32 @@ export default function SolutionForm(
     const indexStr = select.value;
     onSolutionIndexChanged(parseInt(indexStr, 10));
   });
+
+  return form;
+}
+
+function SolutionCount(state: ComputedSolution) {
+  const blurb = document.createElement("p");
+  const numSolutions = state.solutions.length;
+  const text =
+    numSolutions === 1
+      ? `Found 1 solution (${hammingWeight(state.solutions[0])} moves)`
+      : `Found ${numSolutions} solutions`;
+  blurb.appendChild(document.createTextNode(text));
+  return blurb;
+}
+
+export default function SolutionForm(
+  state: ComputedSolution,
+  onSolutionIndexChanged: (solutionIndex: number) => void,
+): Node {
+  const fragment = document.createDocumentFragment();
+
+  fragment.appendChild(SolutionCount(state));
+
+  if (state.solutions.length > 1) {
+    fragment.appendChild(SolutionSelect(state, onSolutionIndexChanged));
+  }
 
   return fragment;
 }
