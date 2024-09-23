@@ -1,10 +1,14 @@
 import { ComputedSolution } from "../lib/worker_state";
 import { hammingWeight } from "../lib/solve";
 
-function SolutionOption(index: number, solution: number[]): Node {
+function SolutionOption(
+  index: number,
+  label: string,
+  solution: number[],
+): Node {
   const option = document.createElement("option");
   option.value = index.toString();
-  option.text = `#${index} (${hammingWeight(solution)} moves)`;
+  option.text = `${label} (${hammingWeight(solution)} moves)`;
   return option;
 }
 
@@ -18,8 +22,10 @@ function SolutionSelect(
   const select = document.createElement("select");
   select.name = "solution-index";
 
+  const labelWidth = (state.solutions.length - 1).toString(16).length;
   for (let i = 0; i < state.solutions.length; i++) {
-    select.appendChild(SolutionOption(i, state.solutions[i]));
+    const label = `0x${i.toString(16).padStart(labelWidth, "0")}`;
+    select.appendChild(SolutionOption(i, label, state.solutions[i]));
   }
 
   form.appendChild(select);
