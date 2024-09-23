@@ -21,6 +21,7 @@ function SolutionSelect(
 
   const select = document.createElement("select");
   select.name = "solution-index";
+  select.classList.add("solution-index");
 
   const labelWidth = (state.solutions.length - 1).toString(16).length;
   for (let i = 0; i < state.solutions.length; i++) {

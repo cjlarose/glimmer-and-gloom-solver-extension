@@ -58,7 +58,7 @@
   display: flex;
   flex-wrap: wrap;
   width: 90%;
-  margin: 0 auto;
+  margin: 0 auto 1em;
   overflow: hidden;
   padding-bottom: 4.4%;
 }
@@ -119,4 +119,89 @@
 }
 .tile-status-light-muted {
   background-color: var(--color-hex-light-muted);
+}
+
+/*** Collapsible Advanced Options ****************************************************************************/
+/* Adapted from https://www.digitalocean.com/community/tutorials/css-collapsible */
+.wrap-collabsible {
+  margin-bottom: 1.2rem 0;
+}
+
+input[type="checkbox"] {
+  display: none;
+}
+
+.lbl-toggle {
+  display: block;
+
+  font-weight: bold;
+  font-family: monospace;
+  font-size: 1rem;
+  text-transform: uppercase;
+  text-align: center;
+
+  padding: 0.6rem;
+
+  color: hsl(0 0% 50% / 1);
+  background: hsl(0 0% 95% / 1);
+
+  cursor: pointer;
+
+  border-radius: 7px;
+  transition: all 0.25s ease-out;
+}
+
+.lbl-toggle:hover {
+  color: hsl(0 0% 50% / 1);
+}
+
+.lbl-toggle::before {
+  content: " ";
+  display: inline-block;
+
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid currentColor;
+  vertical-align: middle;
+  margin-right: 0.7rem;
+  transform: translateY(-2px);
+
+  transition: transform 0.2s ease-out;
+}
+
+.toggle:checked + .lbl-toggle::before {
+  transform: rotate(90deg) translateX(-3px);
+}
+
+.collapsible-content {
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height 0.25s ease-in-out;
+}
+
+.toggle:checked + .lbl-toggle + .collapsible-content {
+  max-height: 100vh;
+}
+
+.toggle:checked + .lbl-toggle {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  color: hsl(0 0% 35% / 1);
+}
+
+.collapsible-content .content-inner {
+  background: hsl(0deg 0% 90% / 20%);
+  border-bottom: 1px solid hsl(0deg 0% 62% / 45%);
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+  padding: 0.5rem 1rem;
+}
+
+/*** Solution form *******************************************************************************************/
+.solution-form {
+  margin-bottom: 1em;
+}
+
+.solution-index {
+  padding: 5px;
 }

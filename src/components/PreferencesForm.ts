@@ -37,11 +37,13 @@ export default function PreferencesForm(
     switch (select.value) {
       case "dark":
         onPreferencesChanged({
+          ...preferences,
           winner: TileState.DARK,
         });
         break;
       case "light":
         onPreferencesChanged({
+          ...preferences,
           winner: TileState.LIGHT,
         });
         break;
