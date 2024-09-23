@@ -2,6 +2,7 @@ import { WorkerState } from "../lib/worker_state";
 import { Preferences } from "../lib/preferences";
 import Level from "./Level";
 import PreferencesForm from "./PreferencesForm";
+import HowTo from "./HowTo";
 import AdvancedOptions from "./AdvancedOptions";
 
 export default function SidePanelRoot(
@@ -17,6 +18,7 @@ export default function SidePanelRoot(
   const fragment = document.createDocumentFragment();
   fragment.appendChild(PreferencesForm(preferences, onPreferencesChanged));
   fragment.appendChild(Level(state));
+  fragment.appendChild(HowTo());
   fragment.appendChild(
     AdvancedOptions(
       preferences,

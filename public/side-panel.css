@@ -121,6 +121,19 @@
   background-color: var(--color-hex-light-muted);
 }
 
+/*** Help text ***********************************************************************************************/
+.how-to {
+  background: hsl(45deg 100% 90%);
+  padding: 0.6rem;
+  margin-bottom: 1em;
+  color: hsl(45deg 95% 25%);
+  border-radius: 7px;
+}
+
+.how-to p {
+  margin: 0;
+}
+
 /*** Collapsible Advanced Options ****************************************************************************/
 /* Adapted from https://www.digitalocean.com/community/tutorials/css-collapsible */
 .wrap-collabsible {
