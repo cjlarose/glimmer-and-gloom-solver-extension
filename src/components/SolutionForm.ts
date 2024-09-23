@@ -23,9 +23,9 @@ function SolutionSelect(
   select.name = "solution-index";
   select.classList.add("solution-index");
 
-  const labelWidth = (state.solutions.length - 1).toString(16).length;
+  const labelWidth = (state.solutions.length - 1).toString(2).length;
   for (let i = 0; i < state.solutions.length; i++) {
-    const label = `0x${i.toString(16).padStart(labelWidth, "0")}`;
+    const label = `0b${i.toString(2).padStart(labelWidth, "0")}`;
     select.appendChild(SolutionOption(i, label, state.solutions[i]));
   }
 
