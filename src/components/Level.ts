@@ -56,5 +56,9 @@ export default function Level(state: ComputedSolution): Node {
     }
   }
 
-  return levelElement;
+  const levelContainer = document.createElement("div");
+  levelContainer.classList.add("level-container");
+  levelContainer.appendChild(levelElement);
+
+  return levelContainer;
 }

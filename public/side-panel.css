@@ -10,6 +10,10 @@
   padding: 5px;
 }
 
+.level-container {
+  margin-bottom: 1em;
+}
+
 /* adapted from https://github.com/web-tiki/responsive-grid-of-hexagons */
 .level {
   --color-hex-dark-hue: 272;
@@ -58,7 +62,7 @@
   display: flex;
   flex-wrap: wrap;
   width: 90%;
-  margin: 0 auto 1em;
+  margin: 0 auto;
   overflow: hidden;
   padding-bottom: 4.4%;
 }
