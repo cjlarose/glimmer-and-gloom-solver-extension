@@ -28,35 +28,30 @@
   --color-hex-muted-alpha: 0.2;
   --color-hex-muted-saturation-scale: 0.5;
 
-  --color-hex-dark: hsla(
-    var(--color-hex-dark-hue),
-    var(--color-hex-dark-saturation),
-    var(--color-hex-dark-lightness),
-    var(--color-hex-alpha)
+  --color-hex-dark: hsl(
+    var(--color-hex-dark-hue) var(--color-hex-dark-saturation)
+      var(--color-hex-dark-lightness) / var(--color-hex-alpha)
   );
-  --color-hex-dark-muted: hsla(
-    var(--color-hex-dark-hue),
-    calc(
-      var(--color-hex-dark-saturation) * var(--color-hex-muted-saturation-scale)
-    ),
-    var(--color-hex-dark-lightness),
-    var(--color-hex-muted-alpha)
+  --color-hex-dark-muted: hsl(
+    var(--color-hex-dark-hue)
+      calc(
+        var(--color-hex-dark-saturation) *
+          var(--color-hex-muted-saturation-scale)
+      )
+      var(--color-hex-dark-lightness) / var(--color-hex-muted-alpha)
   );
 
-  --color-hex-light: hsla(
-    var(--color-hex-light-hue),
-    var(--color-hex-light-saturation),
-    var(--color-hex-light-lightness),
-    var(--color-hex-alpha)
+  --color-hex-light: hsl(
+    var(--color-hex-light-hue) var(--color-hex-light-saturation)
+      var(--color-hex-light-lightness) / var(--color-hex-alpha)
   );
-  --color-hex-light-muted: hsla(
-    var(--color-hex-light-hue),
-    calc(
-      var(--color-hex-light-saturation) *
-        var(--color-hex-muted-saturation-scale)
-    ),
-    var(--color-hex-light-lightness),
-    var(--color-hex-muted-alpha)
+  --color-hex-light-muted: hsl(
+    var(--color-hex-light-hue)
+      calc(
+        var(--color-hex-light-saturation) *
+          var(--color-hex-muted-saturation-scale)
+      )
+      var(--color-hex-light-lightness) / var(--color-hex-muted-alpha)
   );
 
   display: flex;
