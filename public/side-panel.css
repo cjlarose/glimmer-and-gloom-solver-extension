@@ -16,43 +16,11 @@
 
 /* adapted from https://github.com/web-tiki/responsive-grid-of-hexagons */
 .level {
-  --color-hex-dark-hue: 272;
-  --color-hex-dark-saturation: 20%;
-  --color-hex-dark-lightness: 44%;
+  --color-hex-dark: hsl(272 20% 44% / 1);
+  --color-hex-dark-muted: hsl(272 10% 44% / 0.2);
 
-  --color-hex-light-hue: 42;
-  --color-hex-light-saturation: 84%;
-  --color-hex-light-lightness: 71%;
-
-  --color-hex-alpha: 1;
-  --color-hex-muted-alpha: 0.2;
-  --color-hex-muted-saturation-scale: 0.5;
-
-  --color-hex-dark: hsl(
-    var(--color-hex-dark-hue) var(--color-hex-dark-saturation)
-      var(--color-hex-dark-lightness) / var(--color-hex-alpha)
-  );
-  --color-hex-dark-muted: hsl(
-    var(--color-hex-dark-hue)
-      calc(
-        var(--color-hex-dark-saturation) *
-          var(--color-hex-muted-saturation-scale)
-      )
-      var(--color-hex-dark-lightness) / var(--color-hex-muted-alpha)
-  );
-
-  --color-hex-light: hsl(
-    var(--color-hex-light-hue) var(--color-hex-light-saturation)
-      var(--color-hex-light-lightness) / var(--color-hex-alpha)
-  );
-  --color-hex-light-muted: hsl(
-    var(--color-hex-light-hue)
-      calc(
-        var(--color-hex-light-saturation) *
-          var(--color-hex-muted-saturation-scale)
-      )
-      var(--color-hex-light-lightness) / var(--color-hex-muted-alpha)
-  );
+  --color-hex-light: hsl(42 84% 71% / 1);
+  --color-hex-light-muted: hsl(42 42% 71% / 0.2);
 
   display: flex;
   flex-wrap: wrap;
