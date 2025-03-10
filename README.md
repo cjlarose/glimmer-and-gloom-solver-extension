@@ -2,6 +2,8 @@
 
 Browser extension for helping players solve Glimmer and Gloom games on Flight Rising
 
+![Glimmer & Gloom Solver: Earn new high scores, choose winning side, updates as you play](listing-images/screenshot.png)
+
 ## Build
 
 ```sh
