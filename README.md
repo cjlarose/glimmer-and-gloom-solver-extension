@@ -4,6 +4,8 @@ Browser extension for helping players solve Glimmer and Gloom games on Flight Ri
 
 ![Glimmer & Gloom Solver: Earn new high scores, choose winning side, updates as you play](listing-images/screenshot.png)
 
+For the math, check out https://cjlarose.com/glimmer-and-gloom-solver-extension/
+
 ## Build
 
 ```sh
